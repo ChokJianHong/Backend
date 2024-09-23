@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technician</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+  
+<div class="header">
+  <div class="header-content">
+    <!-- Place your bell and profile icons here -->
+    <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
+    <a href="profile.html"><img src="images/profile.svg" alt="Profile" class="icon"></a>
+  </div>
+</div>
+
+
+<div class="sidebar">
+  <!-- Sidebar content -->
+  <ul>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="technician_schedule.html">Schedule</a></li>
+    <li>Request</a></li>
+    <li><a href="requests.html" id="current-requests">Current Requests</a></li>
+    <li><a href="history.html">Requests History</a></li>
+    <li>Profiles</a></li>
+    <li><a href="technician.html">Technician</a></li>
+    <li><a href="customer.html">Customer</a></li>
+    <li>Application</li>
+    <li><a href="banner.html">Homepage Banner</a></li>
+    <!-- Additional links can be added here -->
+  </ul>
+  <button id="logout" class="logout-btn">Log Out</button>
+</div>
+
+<!-- Rest of your dashboard content -->
+
+<div class="dashboard-container">
+  <div class="container">
+    <div class="customerflex">
+      <h1>Technician List</h1> 
+      
+      <a href="#" class="mr-4"><button class="employeerequestbtn" data-toggle="modal" data-target="#add-modal">Add Technician</button></a>
+      
+      <!-- <a href="employeerequest.html"><button class="employeerequestbtn">Employee Request</button></a> -->
+
+    </div>
+    <!-- Pending Request List -->
+    <div class="pending-request">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Job Position</th>
+              <th colspan="3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="technician-details">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" role="dialog" id="add-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button> 
+      </div>
+      <div class="modal-body">
+        <form id="addTechnicianForm">
+          <div class="d-flex flex-column align-items-center">
+            <h2 class="alignh2">Add Technician</h2>
+            <div id="errorMessage" class="my-3 text-danger"></div>
+          </div>
+        </br>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control name" id="name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control email" id="email">
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="text" class="form-control password" id="password">
+          </div>
+          <div class="form-group">
+            <label for="specialization">Specialization:</label>
+            <select class="form-control specialization" id="specialization">
+              <option value="alarm">Alarm</option>
+              <option value="autogate">Autogate</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="text" id="phone" class="form-control phone">
+          </div>
+          <div class="form-group">
+            <label for="location">Location:</label>
+            <input type="text" id="location" class="form-control location">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button  type="submit" id="addTechnician" class="cusaddbtn addBtn" style="margin-right: 40%;">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" role="dialog" id="edit-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button> 
+      </div>
+      <div class="modal-body">
+        <form>
+          <h2 class="alignh2">Edit</h2>
+          </br>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control name" id="edit-name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control email" id="edit-email" placeholder="yeahscience@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone No:</label>
+            <input type="text" class="form-control phone" id="edit-phone" >
+          </div>
+          <div class="form-group">
+            <label for="job">Job Type:</label>
+            <input type="text" class="form-control job" id="edit-job">
+          </div>
+          <div class="form-group">
+            <label for="location">Location:</label>
+            <input type="text" id="location" class="form-control location">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="savechange" type="submit" class="btn btn-secondary editbtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" role="dialog" id="delete-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button> 
+      </div>
+      <div class="modal-body">
+        <form>
+            <h2 class="alignh2">Are you sure you want to delete this profile?</h2>
+          </br>
+          <p><strong>Name:</strong> <span class="technician-name"></span></p>
+          <p><strong>Location:</strong> <span class="technician-location"></span></p>
+          <p><strong>Email:</strong> <span class="technician-email"></span></p>
+          <p><strong>Phone No:</strong> <span class="technician_phone"></span></p>
+          <p><strong>Job Type:</strong> <span class="technician_job"></span></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="deletebtn" style="margin-right: 35%; font-size: 20px;">Delete Profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="./technician.js"></script>
+</body>
+</html>

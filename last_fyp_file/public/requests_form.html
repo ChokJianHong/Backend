@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Current Request</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      text-align: center;
+      padding: 8px;
+      background-color: #f2f2f2;
+    }
+
+    td {
+      text-align: center;
+      padding: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-content">
+      <!-- Place your bell and profile icons here -->
+      <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon" /></a>
+      <img src="images/profile.svg" alt="Profile" class="icon" />
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <!-- Sidebar content -->
+    <ul>
+      <li><a href="technician_dashboard.html">Dashboard</a></li>
+      <li><a href="requests_form.html">Request Form</a></li>
+      <li><a href="change_password.html">Change Password</a></li>
+      <li id="logout"><a href="login.html">Logout</a></li>
+    </ul>
+  </div>
+  <!-- Rest of your dashboard content -->
+
+  <div class="dashboard-container">
+    <div class="container">
+      <h1>Spare-part Request Form</h1>
+      <div class="history-detail">
+        <form>
+          <input type="hidden" id="technician_name" name="technician_name">
+
+          <label for="customer">Customer Name:</label>
+          <input type="text" id="customer" name="customer"><br><br>
+
+          <label for="equipment">Equipment:</label>
+          <input type="text" id="equipment" name="equipment"><br><br>
+
+          <label for="brand">Brand:</label>
+          <input type="text" id="brand" name="brand"><br><br>
+
+          <label for="parts">Parts Needed:</label><br>
+          <textarea id="parts" name="parts"></textarea><br><br>
+          <div class="row mt-4">
+            <div class="col-md-12 text-center">
+              <button type="submit" id="request_form_submit_button">Submit Request</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+    <div class="container mt-4">
+      <div class="mt-4">
+        <h3>Submitted Request Forms</h3>
+        <hr/>
+        <div id="request_form_notification_tech">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="./request_form.js"></script>
+
+  <script>
+    // Function to fetch and display notifications
+    async function loadNotifications() {
+      const token = localStorage.getItem("token");  // Assuming the token is stored in localStorage
+      var name 
+    if (token) {
+        const decodedToken = parseJwt(token);
+        name= decodedToken.email; // Add technician name to the form
+        
+    }
+      try {
+        const response = await fetch(`http://localhost:5005/dashboarddatabase/request/technician/${name}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const notifications = await response.json();
+        const notificationContainer = document.getElementById('request_form_notification_tech');
+        console.log("Got data of  request form ")
+        // Clear existing notifications
+        notificationContainer.innerHTML = '';
+
+        // Iterate over notifications and create HTML
+        notifications.forEach(notification => {
+          const createdAt = new Date(notification.created_at); // Convert to Date object
+          const formattedDate = createdAt.toLocaleDateString(); // Format to display only date
+          const notificationHTML = `
+          <div class="card request-notification">
+            <div class="card-body">
+              <h5 class="card-title">#00${notification.id}: Spare-part Request Form</h5>
+              <p class="card-text"><span class="notification-date">${formattedDate}</span></p>
+              <p class="card-text"><span class="notification-date"> <b>${notification.customer_name}<b/> </span></p>
+              <p class="card-text"><span class="notification-date"> <b>${notification.status}<b/> </span></p>
+            </div>
+          </div>
+        `;
+          notificationContainer.insertAdjacentHTML('beforeend', notificationHTML);
+        });
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    }
+
+    // Function to delete a notification
+    async function deleteNotification(id) {
+      try {
+        const response = await fetch(`http://localhost:5005/dashboarddatabase/request/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        // Remove the notification from the DOM
+        const notificationElement = document.querySelector(`#request_form_notification_tech .card[data-id='${id}']`);
+        if (notificationElement) {
+          notificationElement.remove();
+        }
+      } catch (error) {
+        console.error('Error deleting notification:', error);
+      }
+    }
+
+    // Load notifications when the page is loaded
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+  </script>
+
+
+
+</body>
+
+</html>
