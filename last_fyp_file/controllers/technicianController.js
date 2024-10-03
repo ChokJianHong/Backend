@@ -146,10 +146,35 @@ function deleteTechnician(req, res) {
   });
 }
 
+function getTechnicianByToken(req, res) {
+  const token = req.headers.authorization.split(" ")[1]; // Extract token from authorization header
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized", status: 401 });
+  }
+
+  const getTechnicianQuery = `SELECT * FROM technician WHERE token = '${token}'`;
+  db.query(getTechnicianQuery, (error, technician) => {
+    if (error) {
+      throw error;
+    }
+
+    if (technician.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Technician not found", status: 404 });
+    }
+
+    return res.status(200).json({ status: 200, data: technician[0] });
+  });
+}
+
+
 module.exports = {
   createTechnician,
   getAllTechnicians,
   getTechnicianById,
   updateTechnician,
   deleteTechnician,
+  getTechnicianByToken
 };

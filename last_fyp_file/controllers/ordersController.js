@@ -572,7 +572,67 @@ function viewCompletedOrderHistory(req, res) {
   });
 }
 
+function viewOrdersDetail(req, res) {
+  const orderId = req.params.id;
 
+  const dbQuery = `
+    SELECT 
+      ordertable.*,
+      c.name AS customer_name,
+      c.location AS customer_address,
+      c.phone_number AS customer_phone_number,
+      c.email as customer_email,
+      c.auto_gate_brand as customer_auto_gate_brand,
+      c.alarm_brand as customer_alarm_brand,
+      c.warranty as customer_warranty
+    FROM 
+      ordertable
+    JOIN 
+      customer c ON ordertable.customer_id = c.customer_id
+    LEFT JOIN
+      technician t ON ordertable.technician_id = t.technician_id
+    WHERE 
+      ordertable.order_id = ${orderId}
+  `;
+
+  db.query(dbQuery, (error, results) => {
+    if (error) {
+      console.error("Error executing database query:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Order not found", status: 404 });
+    }
+    
+    const orderDetails = {
+      orderId: results[0].order_id,
+      orderDate: results[0].order_date,
+      orderDoneDate: results[0].order_done_date,
+      orderStatus: results[0].order_status,
+      orderImage: results[0].order_img,
+      orderDoneImage: results[0].order_done_img,
+      orderDetail: results[0].order_detail,
+      priority: results[0].urgency_level,
+      locationDetail: results[0].location_detail,
+      priceStatus: results[0].price_status,
+      totalPrice: results[0].total_price,
+      ProblemType: results[0].problem_type,
+      customer: {
+        name: results[0].customer_name,
+        address: results[0].customer_address,
+        email: results[0].customer_email,
+        phone: results[0].customer_phone_number,
+        autogateBrand: results[0].customer_auto_gate_brand,
+        alarmBrand: results[0].customer_alarm_brand,
+        warranty: results[0].customer_warranty,
+      },
+    };
+
+    return res.status(200).json({ status: 200, result: orderDetails });
+  });
+}
 
 
 
@@ -593,5 +653,6 @@ module.exports = {
   markOrderCompleted,
   createReview,
   getOrderById,
-  deleteOrder
+  deleteOrder,
+  viewOrdersDetail
 };
