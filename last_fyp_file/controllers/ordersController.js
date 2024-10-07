@@ -612,6 +612,7 @@ function viewOrdersDetail(req, res) {
       orderDate: results[0].order_date,
       orderDoneDate: results[0].order_done_date,
       orderStatus: results[0].order_status,
+      orderTime: results[0].order_time,
       orderImage: results[0].order_img,
       orderDoneImage: results[0].order_done_img,
       orderDetail: results[0].order_detail,
