@@ -576,24 +576,25 @@ function viewOrdersDetail(req, res) {
   const orderId = req.params.id;
 
   const dbQuery = `
-    SELECT 
-      ordertable.*,
-      c.name AS customer_name,
-      c.location AS customer_address,
-      c.phone_number AS customer_phone_number,
-      c.email as customer_email,
-      c.auto_gate_brand as customer_auto_gate_brand,
-      c.alarm_brand as customer_alarm_brand,
-      c.warranty as customer_warranty
-    FROM 
-      ordertable
-    JOIN 
-      customer c ON ordertable.customer_id = c.customer_id
-    LEFT JOIN
-      technician t ON ordertable.technician_id = t.technician_id
-    WHERE 
-      ordertable.order_id = ${orderId}
-  `;
+  SELECT 
+    ordertable.*,
+    c.name AS customer_name,
+    c.phone_number AS customer_phone_number,
+    c.email AS customer_email,
+    c.auto_gate_brand AS customer_auto_gate_brand,
+    c.alarm_brand AS customer_alarm_brand,
+    c.warranty AS customer_warranty,
+    ordertable.location_details AS location_detail  -- Make sure to include this
+  FROM 
+    ordertable
+  JOIN 
+    customer c ON ordertable.customer_id = c.customer_id
+  LEFT JOIN
+    technician t ON ordertable.technician_id = t.technician_id
+  WHERE 
+    ordertable.order_id = ${orderId}
+`;
+
 
   db.query(dbQuery, (error, results) => {
     if (error) {
@@ -615,7 +616,7 @@ function viewOrdersDetail(req, res) {
       orderDoneImage: results[0].order_done_img,
       orderDetail: results[0].order_detail,
       priority: results[0].urgency_level,
-      locationDetail: results[0].location_detail,
+      locationDetail: results[0].location_detail, // Include location detail here
       priceStatus: results[0].price_status,
       totalPrice: results[0].total_price,
       ProblemType: results[0].problem_type,
@@ -633,6 +634,7 @@ function viewOrdersDetail(req, res) {
     return res.status(200).json({ status: 200, result: orderDetails });
   });
 }
+
 
 
 
