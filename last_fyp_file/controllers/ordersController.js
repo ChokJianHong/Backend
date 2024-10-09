@@ -617,7 +617,7 @@ function viewOrdersDetail(req, res) {
       orderDoneImage: results[0].order_done_img,
       orderDetail: results[0].order_detail,
       priority: results[0].urgency_level,
-      locationDetail: results[0].location_detail, // Include location detail here
+      locationDetail: results[0].location_detail, 
       priceStatus: results[0].price_status,
       totalPrice: results[0].total_price,
       ProblemType: results[0].problem_type,
@@ -635,6 +635,38 @@ function viewOrdersDetail(req, res) {
     return res.status(200).json({ status: 200, result: orderDetails });
   });
 }
+
+function getPendingOrders(req, res) {
+  const pendingOrdersQuery = `
+    SELECT
+      o.*,
+      c.name AS customer_name,
+      c.email AS customer_email,
+      c.location AS customer_location
+    FROM
+      ordertable o
+    LEFT JOIN customer c ON
+      o.customer_id = c.customer_id
+    WHERE
+      o.order_status = 'pending';
+  `;
+
+  // Execute the query
+  db.query(pendingOrdersQuery, (error, rows) => {
+    if (error) {
+      console.error("Error retrieving pending orders:", error);
+      return res.status(500).json({ message: "Internal Server Error", status: 500 });
+    }
+
+    // Return all pending orders
+    return res.status(200).json({ result: rows, status: 200 });
+  });
+}
+
+
+
+
+
 
 
 
@@ -657,5 +689,6 @@ module.exports = {
   createReview,
   getOrderById,
   deleteOrder,
-  viewOrdersDetail
+  viewOrdersDetail,
+  getPendingOrders
 };

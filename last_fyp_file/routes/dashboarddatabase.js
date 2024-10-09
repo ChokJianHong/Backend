@@ -42,6 +42,7 @@ const {
   getOrderById,
   deleteOrder,
   viewOrdersDetail,
+  getPendingOrders,
 } = require("../controllers/ordersController");
 const { decodeToken } = require("../utils/authGuard");
 const {
@@ -79,6 +80,7 @@ router.post("/customer/register", customerRegister);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
 // order routes
+router.get("/orders/pending",decodeToken, getPendingOrders);
 router.get( "/orders/details/:id",decodeToken,viewOrdersDetail);
 router.get("/orders", decodeToken, viewAllOrders);
 router.post("/orders", decodeToken, upload.single("image"), createOrder);
