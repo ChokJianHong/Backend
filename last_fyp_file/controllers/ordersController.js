@@ -578,6 +578,7 @@ function viewOrdersDetail(req, res) {
   const dbQuery = `
   SELECT 
     ordertable.*,
+    c.customer_id AS customer_id,
     c.name AS customer_name,
     c.phone_number AS customer_phone_number,
     c.email AS customer_email,
@@ -622,6 +623,7 @@ function viewOrdersDetail(req, res) {
       totalPrice: results[0].total_price,
       ProblemType: results[0].problem_type,
       customer: {
+        id: results[0].customer_id,
         name: results[0].customer_name,
         address: results[0].customer_address,
         email: results[0].customer_email,
