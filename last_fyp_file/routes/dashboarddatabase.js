@@ -46,6 +46,8 @@ const {
   viewCancelledOrderHistory, // new_addition cancelled
   getOrderById,// new_addition
   deleteOrder,// new_addition_inventory Management
+  viewOrdersDetail,
+  getPendingOrders,
 } = require("../controllers/ordersController");
 const { decodeToken } = require("../utils/authGuard");
 const {
@@ -61,6 +63,7 @@ const {
   getTechnicianById,
   updateTechnician,
   deleteTechnician,
+  getTechnicianByToken,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -80,7 +83,11 @@ router.post("/reset-password", resetPassword);
 // customer routes
 router.post("/customer/register", customerRegister);
 
+//technician routes
+router.get("/technician/:token", getTechnicianByToken);
 // order routes
+router.get("/orders/pending",decodeToken, getPendingOrders);
+router.get( "/orders/details/:id",decodeToken,viewOrdersDetail);
 router.get("/orders", decodeToken, viewAllOrders);
 router.post("/orders", decodeToken, upload.single("image"), createOrder);
 router.get("/orders/history", decodeToken, viewCompletedOrderHistory);
