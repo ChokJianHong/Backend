@@ -677,3 +677,66 @@ button:hover {
   padding: 10px;
   border-radius: 10px;
 }
+
+
+
+
+/* Container and general page styling */
+.dashboard-container {
+  padding: 10px; /* Reduced padding to save space */
+  margin-left: 250px;
+}
+
+.dashboard-container h1 {
+  margin-bottom: 20px; /* Reduced margin for the title */
+  text-align: center;
+  font-size: 1.8em; /* Slightly smaller title */
+}
+
+h2 {
+  text-align: center;
+  margin-top: 5px; /* Reduced space between heading and chart */
+  font-size: 1.2em; /* Slightly smaller sub-headings */
+}
+
+/* Chart styling */
+.chart-container {
+  background-color: #2e3446;
+  border-radius: 15px;
+  padding: 10px; /* Reduced padding inside each chart container */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px; /* Reduced margin between chart containers */
+  width: 48%; /* Two charts side by side, with space for a gap */
+}
+
+/* Make sure rows are spaced properly */
+.chart-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px; /* Reduced space between rows */
+}
+
+/* Responsive behavior for chart containers */
+@media (min-width: 768px) {
+  .chart-container {
+    width: 48%; /* Ensure two charts fit side by side on larger screens */
+  }
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  height: 250px; /* Reduced height to fit more content on the page */
+}
+
+/* Additional styling for small screens */
+@media (max-width: 768px) {
+  .chart-container {
+    width: 100%; /* Charts will stack vertically on smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .chart-container canvas {
+    height: 150px; /* Further reduce the height on small screens */
+  }
+}

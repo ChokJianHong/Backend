@@ -1,7 +1,7 @@
 const express = require("express");
 
 
-// inventory Management
+// new_addition_inventory Management
 const {
   createInventoryItem,
   getAllInventoryItems,
@@ -30,7 +30,7 @@ const {
   completedOrdersCount,
   ongoingOrdersCount,
   viewCompletedOrderHistory,
-  
+  getOrderCountsByDate,
   viewRequestDetail,
   assignTechnician,
   getOrderDetail,
@@ -38,11 +38,14 @@ const {
   invoiceOrder,
   markOrderCompleted,
   createReview,
-  viewCancelledOrderHistory,
-  getOrderById,
-  deleteOrder,
-  viewOrdersDetail,
-  getPendingOrders,
+
+  viewOrderStatusStatistics,//new
+  viewProblemStatistics,//new
+  viewCompletedOrderSales,//new
+  viewTopSpareParts, //new
+  viewCancelledOrderHistory, // new_addition cancelled
+  getOrderById,// new_addition
+  deleteOrder,// new_addition_inventory Management
 } = require("../controllers/ordersController");
 const { decodeToken } = require("../utils/authGuard");
 const {
@@ -50,7 +53,7 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
-  registerAdmin,
+  registerAdmin,// new_addition
 } = require("../controllers/authController");
 const {
   createTechnician,
@@ -58,7 +61,6 @@ const {
   getTechnicianById,
   updateTechnician,
   deleteTechnician,
-  getTechnicianByToken,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -71,36 +73,43 @@ const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRe
 
 // auth routes
 router.post("/login", login);
-router.post("/register-admin", registerAdmin);
+router.post("/register-admin", registerAdmin);// new_addition
 router.post("/change-password", decodeToken, changePassword);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 // customer routes
 router.post("/customer/register", customerRegister);
-//technician routes
-router.get("/technician/:token", getTechnicianByToken);
+
 // order routes
-router.get("/orders/pending",decodeToken, getPendingOrders);
-router.get( "/orders/details/:id",decodeToken,viewOrdersDetail);
 router.get("/orders", decodeToken, viewAllOrders);
 router.post("/orders", decodeToken, upload.single("image"), createOrder);
 router.get("/orders/history", decodeToken, viewCompletedOrderHistory);
-router.get("/orders/history/cancelled", decodeToken, viewCancelledOrderHistory);
+router.get("/orders/history/cancelled", decodeToken, viewCancelledOrderHistory);// new_addition
 router.put("/orders/:id/decline-request", decodeToken, declineOrder);
 router.put("/orders/:id/assign-technician", decodeToken, assignTechnician);
 router.put("/orders/:id/accept", decodeToken, acceptOrder);
 router.get("/orders/:id/invoice", decodeToken, invoiceOrder);
-router.get("/orders/:id", decodeToken, getOrderById);
-router.put("/orders/:id", decodeToken, createReview);
-router.delete("/orders/:id", decodeToken, deleteOrder);
+
+router.get("/orders/problem-stats", decodeToken, viewProblemStatistics);//new
+router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
+router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
+router.get("/orders/spare-parts",decodeToken, viewTopSpareParts);//new
+
+
+router.get("/orders/:id", decodeToken, getOrderById);// new_addition
+router.put("/orders/:id", decodeToken, createReview);// new_addition
+router.delete("/orders/:id", decodeToken, deleteOrder);// new_addition
+
 router.put(
   "/orders/:id/mark-complete",
   decodeToken,
   upload.single("image"),
   markOrderCompleted
 );
+
 router.get("/orders/:id/request-detail", decodeToken, viewRequestDetail);
 router.get("/orders/pending/count", decodeToken, pendingOrdersCount);
+
 router.get("/orders/completed/count", decodeToken, completedOrdersCount);
 router.get("/orders/ongoing/count", decodeToken, ongoingOrdersCount);
 // admin routes
@@ -120,7 +129,7 @@ router.get("/admin/banner/:id", decodeToken, getBannerById);
 router.put("/admin/banner/:id", decodeToken, upload.single("image"), updateBanner);
 
 
-// request form 
+// request form // new_addition
 router.post("/request",  createRequestForm);
 router.put("/request/:id",  updateRequestFormStatus);
 router.get("/request",  getAllRequestForms);
@@ -128,9 +137,9 @@ router.delete("/request/:id",  deleteRequestForm);
 router.get("/request/:id",  getRequestFormById);
 router.get("/request/technician/:name", getRequestFormsByTechnician);
 
-// inventory
+// inventory// new_addition
 
-// Inventory Routes
+// Inventory Routes // new_addition
 router.post("/inventory",  createInventoryItem);
 router.get("/inventory", getAllInventoryItems);
 router.get("/inventory/:id",  getInventoryItemById);

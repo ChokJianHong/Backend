@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      const baseUrl = "http://localhost:5005/dashboarddatabase";
+  
+      // Fetch problem statistics
+      function fetchProblemStatistics() {
+          let url = `${baseUrl}/orders/problem-stats`;
+          const token = localStorage.getItem("token");
+          if (!token) {
+              console.error("No token found in local storage");
+              return;
+          }
+          fetch(url, {
+              method: 'GET',
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `${token}`,
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 401) {
+                  window.location.href = "unauthorize_response.html";
+              }
+              displayProblemStatistics(data);
+          })
+          .catch(error => console.error('Error fetching problem statistics:', error));
+      }
+  
+      function displayProblemStatistics(data) {
+    const months = [];
+    const alarmCounts = [];
+    const autogateCounts = [];
+
+    data.slice(1).forEach(row => {
+        months.push(row[0]);         // Month
+        alarmCounts.push(row[1]);    // Alarm count
+        autogateCounts.push(row[2]); // Autogate count
+    });
+
+    const ctx = document.getElementById('problemChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,  // X-axis labels (Months)
+            datasets: [
+                {
+                    label: 'Alarm',
+                    data: alarmCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Autogate',
+                    data: autogateCounts,
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Months' } },
+                y: { title: { display: true, text: 'Problem Count' } }
+            }
+        }
+    });
+}
+      // Fetch order status statistics
+      function fetchOrderStatusStatistics() {
+          const url = `${baseUrl}/orders/status-stats`;
+          const token = localStorage.getItem("token");
+          if (!token) {
+              console.error("No token found in local storage");
+              return;
+          }
+          fetch(url, {
+              method: 'GET',
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `${token}`,
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 401) {
+                  window.location.href = "unauthorize_response.html";
+              }
+              displayOrderStatusChart(data);
+          })
+          .catch(error => console.error('Error fetching order status statistics:', error));
+      }
+  
+      // Function to display Order Status Statistics (Ongoing, Completed, Cancelled over Months)
+      function displayOrderStatusChart(data) {
+    const months = [];
+    const ongoingCounts = [];
+    const completedCounts = [];
+    const cancelledCounts = [];
+
+    data.slice(1).forEach(row => {
+        months.push(row[0]);         // Month
+        ongoingCounts.push(row[1]);  // Ongoing count
+        completedCounts.push(row[2]); // Completed count
+        cancelledCounts.push(row[3]); // Cancelled count
+    });
+
+    const ctx = document.getElementById('orderStatusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,  // X-axis labels (Months)
+            datasets: [
+                {
+                    label: 'Ongoing',
+                    data: ongoingCounts,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Completed',
+                    data: completedCounts,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Cancelled',
+                    data: cancelledCounts,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Months' } },
+                y: { title: { display: true, text: 'Order Count' } }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+}
+  // Fetch completed order sales statistics
+function fetchCompletedOrderSales() {
+    const url = `${baseUrl}/orders/completed-sales-stats`;
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.error("No token found in local storage");
+        return;
+    }
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+        }
+    })
+    .then(response => {
+        if (!response.ok && response.status === 401) {
+            window.location.href = "unauthorize_response.html";
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayCompletedOrderSalesChart(data);
+    })
+    .catch(error => console.error('Error fetching completed order sales data:', error));
+}
+
+
+// Function to calculate simple moving average (SMA) for the last X months
+function calculateSimpleMovingAverage(data, numberOfMonths) {
+    if (data.length < numberOfMonths) {
+        return 0; // Not enough data to calculate the moving average
+    }
+
+    // Get the last X months of data
+    const relevantData = data.slice(-numberOfMonths);
+
+    // Calculate the average of the last X months
+    const sum = relevantData.reduce((acc, value) => acc + value, 0);
+    const average = sum / numberOfMonths;
+
+    return average; // Return the average
+}
+
+// Function to display completed order sales chart with simple moving average prediction
+function displayCompletedOrderSalesChart(data) {
+    const months = [];
+    const totalPrices = [];
+
+    // Extract months and total prices from data
+    data.slice(1).forEach(row => {
+        months.push(row[0]);         // Month
+        totalPrices.push(row[2]);    // Total price
+    });
+
+    console.log("Extracted Months:", months);
+    console.log("Extracted Total Prices:", totalPrices);
+
+    // Check if we have enough data to calculate the simple moving average
+    const lastXMonths = 3; // You can change this value to consider more months for the moving average
+    if (totalPrices.length < lastXMonths) {
+        console.error("Not enough data to calculate predictions");
+        return;
+    }
+
+    // Calculate the simple moving average for the last X months
+    const averagePrice = calculateSimpleMovingAverage(totalPrices, lastXMonths);
+    console.log("Calculated Simple Moving Average:", averagePrice);
+
+    // Generate future months
+    const futureMonths = getNextMonths(months[months.length - 1], 12); // Predict next 12 months
+
+    // Use the simple moving average for prediction
+    const predictions = futureMonths.map(() => averagePrice); // Use the average price for predictions
+
+    // Get the canvas context for the chart
+    const ctx = document.getElementById('completedOrderSalesChart');
+    if (!ctx) {
+        console.error("Canvas element not found!"); // Check if canvas exists
+        return;
+    }
+
+    new Chart(ctx.getContext('2d'), {
+        type: 'line', // Use line chart for both actual and predicted values
+        data: {
+            labels: [...months, ...futureMonths],  // X-axis labels (Months)
+            datasets: [
+                {
+                    label: 'Total Price (Actual)',
+                    data: totalPrices, // Actual data only
+                    backgroundColor: 'rgba(255, 206, 86, 0.6)', // Color for actual data
+                    borderColor: 'rgba(255, 206, 86, 1)', // Border color for actual data
+                    borderWidth: 2,
+                    fill: false, // No fill for the line chart
+                    lineTension: 0.2,
+                },
+                {
+                    label: 'Predicted Total Price',
+                    data: [...new Array(months.length).fill(null), ...predictions], // Predictions for future months
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // Different color for prediction
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false, // No fill for the line chart
+                    lineTension: 0.2,
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: { 
+                    title: { display: true, text: 'Months' },
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12, // Limit the number of ticks on x-axis
+                    },
+                },
+                y: { 
+                    title: { display: true, text: 'Total Price' },
+                    ticks: {
+                        beginAtZero: true // Start the y-axis from 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Utility function to generate future month labels
+function getNextMonths(lastMonth, numMonths) {
+    const result = [];
+    const [year, month] = lastMonth.split('-').map(Number);
+
+    for (let i = 1; i <= numMonths; i++) {
+        const nextDate = new Date(year, month + i - 1, 1); // Calculate next date
+        const nextMonth = nextDate.toISOString().substring(0, 7); // Format: YYYY-MM
+        result.push(nextMonth); // Push the formatted month
+    }
+
+    return result;
+}
+
+
+
+
+    // Fetch top spare parts statistics
+    function fetchTopSpareParts() {
+        const url = `${baseUrl}/orders/spare-parts`;  // Adjust the URL according to your API
+        const token = localStorage.getItem("token");  // Assuming you have a token for authentication
+
+        if (!token) {
+            console.error("No token found in local storage");
+            return;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `${token}`,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 401) {
+                window.location.href = "unauthorize_response.html";
+            } else {
+                displayTopSparePartsChart(data.result);  // Use data.result to get the top spare parts
+            }
+        })
+        .catch(error => console.error('Error fetching top spare parts:', error));
+    }
+    function displayTopSparePartsChart(spareParts) {
+    const sparePartNames = spareParts.map(part => part.spare_part);
+    const occurrences = spareParts.map(part => part.occurrences);
+
+    const ctxSpareParts = document.getElementById('topSparePartsChart').getContext('2d');
+    new Chart(ctxSpareParts, {
+        type: 'bar', // Change chart type to bar
+        data: {
+            labels: sparePartNames,
+            datasets: [{
+                label: 'Occurrences',
+                data: occurrences,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                x: { // X-axis configuration
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Spare Parts'
+                    }
+                },
+                y: { // Y-axis configuration
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Occurrences'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hide the legend if you want a cleaner look
+                }
+            }
+        }
+    });
+}
+
+
+      // Call these functions on page load
+      window.onload = function() {
+          fetchProblemStatistics();
+          fetchTopSpareParts();
+          fetchOrderStatusStatistics();
+          fetchCompletedOrderSales(); // Call the new function for completed order sales
+      };
+  </script>
+  
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <!-- Place your bell and profile icons here -->
+      <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
+      <img src="images/profile.svg" alt="Profile" class="icon">
+    </div>
+  </div>
+  
+  
+  <div class="sidebar">
+    <!-- Sidebar content -->
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="technician_schedule.html">Schedule</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="analysis.html">b</a></li>
+  
+      <li>Request</a></li>
+      <li><a href="requests.html" id="current-requests">Current Requests</a></li>
+      <li><a href="history.html">Requests History</a></li>
+      <li><a href="cancelled_history.html">Cancel History</a></li>
+      <li>Profiles</a></li>
+      <li><a href="technician.html">Technician</a></li>
+      <li><a href="customer.html">Customer</a></li>
+      <li>Application</li>
+      <li><a href="banner.html">Homepage Banner</a></li>
+      <!-- Additional links can be added here -->
+    </ul>
+    <button id="logout" class="logout-btn">Log Out</button>
+  </div>
+  
+  <!-- Rest of your dashboard content -->
+  
+  <div class="dashboard-container">
+    <h1>Statistics Dashboard</h1>
+
+    <!-- Chart Row 1 -->
+    <div class="row chart-row">
+        <!-- Problem Type Statistics Chart -->
+        <div class="col-md-6 chart-container">
+            <h2>Problem Type Statistics</h2>
+            <canvas id="problemChart"></canvas>
+        </div>
+
+        <!-- Order Status Statistics Chart -->
+        <div class="col-md-6 chart-container">
+            <h2>Order Status Statistics</h2>
+            <canvas id="orderStatusChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart Row 2 -->
+    <div class="row chart-row">
+        <!-- Completed Order Sales Chart -->
+        <div class="col-md-6 chart-container">
+            <h2>Completed Order Sales</h2>
+            <canvas id="completedOrderSalesChart"></canvas>
+        </div>
+
+        <!-- Spare Parts Chart -->
+        <div class="col-md-6 chart-container">
+            <h2>Top Spare Parts</h2>
+            <canvas id="topSparePartsChart"></canvas>
+        </div>
+    </div>
+</div>
+  
+</body>
+</html>

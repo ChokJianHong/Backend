@@ -34,7 +34,7 @@ function deleteOrder(req, res) {
   
   const { id } = req.params;
 
-  // Use string interpolation to build the query
+  // Use string interpolation to build the query // new_addition 
   const deleteRequestFormQuery = `
         DELETE FROM ordertable
         WHERE order_id = '${id}'
@@ -351,7 +351,7 @@ function markOrderCompleted(req, res) {
   });
 }
 
-// Function to get an order by its ID
+// Function to get an order by its ID // new_addition 
 function getOrderById(req, res) {
   const orderId = req.params.id;
 
@@ -513,7 +513,7 @@ function viewAllOrders(req, res) {
   });
 }
 
-
+// new_addition 
 function viewCancelledOrderHistory(req, res){
   const { type } = req.user;
 
@@ -540,6 +540,37 @@ function viewCancelledOrderHistory(req, res){
   });
 };
 
+function getOrderCountsByDate(req, res) {
+  const orderCountsQuery = `
+    SELECT 
+      order_date,
+      order_status, 
+      COUNT(*) as count 
+    FROM ordertable 
+    GROUP BY order_date, order_status
+    ORDER BY order_date
+  `;
+
+  db.query(orderCountsQuery, (error, results) => {
+    if (error) {
+      console.error("Error fetching order counts by date:", error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    // Organize results by date
+    const dataByDate = {};
+    results.forEach(row => {
+      const { order_date, order_status, count } = row;
+      if (!dataByDate[order_date]) {
+        dataByDate[order_date] = { completed: 0, ongoing: 0, cancelled: 0 };
+      }
+      dataByDate[order_date][order_status] = count;
+    });
+
+    res.json({ dataByDate, status: 200 });
+  });
+}
 
 
 
@@ -572,96 +603,126 @@ function viewCompletedOrderHistory(req, res) {
   });
 }
 
-function viewOrdersDetail(req, res) {
-  const orderId = req.params.id;
-
-  const dbQuery = `
-  SELECT 
-    ordertable.*,
-    c.customer_id AS customer_id,
-    c.name AS customer_name,
-    c.phone_number AS customer_phone_number,
-    c.email AS customer_email,
-    c.auto_gate_brand AS customer_auto_gate_brand,
-    c.alarm_brand AS customer_alarm_brand,
-    c.warranty AS customer_warranty,
-    ordertable.location_details AS location_detail  -- Make sure to include this
-  FROM 
-    ordertable
-  JOIN 
-    customer c ON ordertable.customer_id = c.customer_id
-  LEFT JOIN
-    technician t ON ordertable.technician_id = t.technician_id
-  WHERE 
-    ordertable.order_id = ${orderId}
-`;
 
 
-  db.query(dbQuery, (error, results) => {
-    if (error) {
-      console.error("Error executing database query:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-      return;
-    }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Order not found", status: 404 });
-    }
-    
-    const orderDetails = {
-      orderId: results[0].order_id,
-      orderDate: results[0].order_date,
-      orderDoneDate: results[0].order_done_date,
-      orderStatus: results[0].order_status,
-      orderTime: results[0].order_time,
-      orderImage: results[0].order_img,
-      orderDoneImage: results[0].order_done_img,
-      orderDetail: results[0].order_detail,
-      priority: results[0].urgency_level,
-      locationDetail: results[0].location_detail, 
-      priceStatus: results[0].price_status,
-      totalPrice: results[0].total_price,
-      ProblemType: results[0].problem_type,
-      customer: {
-        id: results[0].customer_id,
-        name: results[0].customer_name,
-        address: results[0].customer_address,
-        email: results[0].customer_email,
-        phone: results[0].customer_phone_number,
-        autogateBrand: results[0].customer_auto_gate_brand,
-        alarmBrand: results[0].customer_alarm_brand,
-        warranty: results[0].customer_warranty,
-      },
-    };
 
-    return res.status(200).json({ status: 200, result: orderDetails });
-  });
-}
 
-function getPendingOrders(req, res) {
-  const pendingOrdersQuery = `
-    SELECT
-      o.*,
-      c.name AS customer_name,
-      c.email AS customer_email,
-      c.location AS customer_location
-    FROM
-      ordertable o
-    LEFT JOIN customer c ON
-      o.customer_id = c.customer_id
-    WHERE
-      o.order_status = 'pending';
+
+
+function viewProblemStatistics(req, res) {
+  const { type } = req.user;
+
+  // Check if the user is an admin
+  if (type !== "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // SQL query to count problem types grouped by month
+  const problemStatsQuery = `
+      SELECT 
+          DATE_FORMAT(order_date, '%Y-%m') AS month, 
+          problem_type, 
+          COUNT(*) AS problem_count
+      FROM 
+          ordertable
+      WHERE 
+          problem_type IN ('alarm', 'autogate')  -- Filter for specific problem types
+      GROUP BY 
+          DATE_FORMAT(order_date, '%Y-%m'), 
+          problem_type
+      ORDER BY 
+          month ASC;
   `;
 
   // Execute the query
-  db.query(pendingOrdersQuery, (error, rows) => {
-    if (error) {
-      console.error("Error retrieving pending orders:", error);
-      return res.status(500).json({ message: "Internal Server Error", status: 500 });
-    }
+  db.query(problemStatsQuery, (error, rows) => {
+      if (error) {
+          console.error("Error fetching problem statistics:", error);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
 
-    // Return all pending orders
-    return res.status(200).json({ result: rows, status: 200 });
+      // Format the data for Google Charts
+      const formattedData = [['Month', 'Alarm', 'Autogate']];
+      const monthMap = new Map();
+
+      rows.forEach(row => {
+          if (!monthMap.has(row.month)) {
+              monthMap.set(row.month, { alarm: 0, autogate: 0 });
+          }
+          if (row.problem_type === 'alarm') {
+              monthMap.get(row.month).alarm = row.problem_count;
+          } else if (row.problem_type === 'autogate') {
+              monthMap.get(row.month).autogate = row.problem_count;
+          }
+      });
+
+      // Convert the Map into an array suitable for Google Charts
+      monthMap.forEach((value, key) => {
+          formattedData.push([key, value.alarm, value.autogate]);
+      });
+
+      // Return the formatted data
+      res.json(formattedData);
+  });
+}
+
+
+function viewOrderStatusStatistics(req, res) {
+  const { type } = req.user;
+
+  // Check if the user is an admin
+  if (type !== "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // SQL query to count order statuses grouped by month
+  const orderStatusQuery = `
+      SELECT 
+          DATE_FORMAT(order_date, '%Y-%m') AS month, 
+          order_status, 
+          COUNT(*) AS order_count
+      FROM 
+          ordertable
+      WHERE 
+          order_status IN ('ongoing', 'completed', 'cancelled')
+      GROUP BY 
+          month, order_status
+      ORDER BY 
+          month ASC;
+  `;
+
+  // Execute the query
+  db.query(orderStatusQuery, (error, rows) => {
+      if (error) {
+          console.error("Error fetching order status statistics:", error);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Format the data for Google Charts
+      const formattedData = [['Month', 'Ongoing', 'Completed', 'Cancelled']];
+      const monthMap = new Map();
+
+      rows.forEach(row => {
+          if (!monthMap.has(row.month)) {
+              monthMap.set(row.month, { ongoing: 0, completed: 0, cancelled: 0 });
+          }
+          if (row.order_status === 'ongoing') {
+              monthMap.get(row.month).ongoing = row.order_count;
+          } else if (row.order_status === 'completed') {
+              monthMap.get(row.month).completed = row.order_count;
+          } else if (row.order_status === 'cancelled') {
+              monthMap.get(row.month).cancelled = row.order_count;
+          }
+      });
+
+      // Convert the Map into an array suitable for Google Charts
+      monthMap.forEach((value, key) => {
+          formattedData.push([key, value.ongoing, value.completed, value.cancelled]);
+      });
+
+      // Return the formatted data
+      res.json(formattedData);
   });
 }
 
@@ -669,11 +730,103 @@ function getPendingOrders(req, res) {
 
 
 
+function viewCompletedOrderSales(req, res) {
+  const { type } = req.user;
+
+  // Check if the user is an admin
+  if (type !== "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // SQL query to get completed order counts and total price grouped by month
+  const completedOrderSalesQuery = `
+      SELECT 
+          DATE_FORMAT(order_date, '%Y-%m') AS month, 
+          COUNT(*) AS order_count,
+          SUM(total_price) AS total_price
+      FROM 
+          ordertable
+      WHERE 
+          order_status = 'completed'
+      GROUP BY 
+          month
+      ORDER BY 
+          month ASC;
+  `;
+
+  // Execute the query
+  db.query(completedOrderSalesQuery, (error, rows) => {
+      if (error) {
+          console.error("Error fetching completed order sales data:", error);
+          return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Format the data for the chart
+      const formattedData = [['Month', 'Order Count', 'Total Price']];
+      rows.forEach(row => {
+          formattedData.push([row.month, row.order_count, row.total_price]);
+      });
+
+      // Return the formatted data
+      res.json(formattedData);
+  });
+}
+
+
+
+
+
+
+
+function viewTopSpareParts(req, res) {
+  const { type } = req.user;
+
+  // Check if the user is an admin
+  if (type !== "admin") {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // SQL query to get the top 3 most occurring spare parts
+  const topSparePartsQuery = `
+    SELECT 
+        spare_part, 
+        COUNT(spare_part) AS occurrences 
+    FROM 
+        requestspareparttable
+    GROUP BY 
+        spare_part
+    ORDER BY 
+        occurrences DESC
+    LIMIT 3;
+  `;
+
+  // Execute the query
+  db.query(topSparePartsQuery, (error, rows) => {
+    if (error) {
+      console.error("Error fetching top spare parts:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    // Return the result
+    res.status(200).json({ result: rows, status: 200 });
+  });
+}
+
+
+
+
+ 
 
 
 
 
 module.exports = {
+  
+  viewTopSpareParts,
+  viewOrderStatusStatistics,
+  viewProblemStatistics,
+  viewCompletedOrderSales,
+  getOrderCountsByDate,
   createOrder,
   viewAllOrders,
   pendingOrdersCount,
@@ -690,7 +843,5 @@ module.exports = {
   markOrderCompleted,
   createReview,
   getOrderById,
-  deleteOrder,
-  viewOrdersDetail,
-  getPendingOrders
+  deleteOrder
 };
