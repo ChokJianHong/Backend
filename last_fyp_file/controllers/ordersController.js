@@ -820,7 +820,6 @@ function viewOrdersDetail(req, res) {
   const dbQuery = `
     SELECT 
       ordertable.*,
-      c.customer_id AS customer_id,
       c.name AS customer_name,
       c.location AS customer_address,
       c.phone_number AS customer_phone_number,
@@ -828,7 +827,7 @@ function viewOrdersDetail(req, res) {
       c.auto_gate_brand as customer_auto_gate_brand,
       c.alarm_brand as customer_alarm_brand,
       c.warranty as customer_warranty
-      ordertable.location_details AS location_detail
+      
     FROM 
       ordertable
     JOIN 
@@ -860,12 +859,13 @@ function viewOrdersDetail(req, res) {
       orderDoneImage: results[0].order_done_img,
       orderDetail: results[0].order_detail,
       priority: results[0].urgency_level,
-      locationDetail: results[0].location_detail,
+      locationDetail: results[0].location_details,
       priceStatus: results[0].price_status,
       totalPrice: results[0].total_price,
       ProblemType: results[0].problem_type,
+      CustomerID: results[0].customer_id,
+      TechnicianID: results[0].technician_id,
       customer: {
-        id: results[0].customer_id,
         name: results[0].customer_name,
         address: results[0].customer_address,
         email: results[0].customer_email,
