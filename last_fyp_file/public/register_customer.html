@@ -1,19 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register Customer</title>
-<link rel="stylesheet" href="signin_style.css">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Customer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Google Fonts for a better font style -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('images/back.png') repeat; /* Use the pattern image as a repeating background */
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-size: cover;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+      animation: fadeIn 1.2s ease-in-out; /* Smooth fade-in animation */
+      color: #fff;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card-header h3, .login-header h2 {
+      color: #ff4d4d; /* Red heading for emphasis */
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .form-control {
+      margin-bottom: 15px;
+      padding: 12px 20px;
+      font-size: 15px;
+      border-radius: 5px;
+      background-color: #fff; /* Darker input background */
+      color: #fff; /* White input text */
+      border: 1px solid #444; /* Subtle border */
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: #ff4d4d; /* Red border on focus */
+      box-shadow: 0px 0px 8px rgba(255, 77, 77, 0.5);
+    }
+
+    .btn-primary {
+      background-color: #ff4d4d; /* Red button color */
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #ff1a1a; /* Darker red on hover */
+      box-shadow: 0px 5px 10px rgba(255, 77, 77, 0.3);
+    }
+
+    a {
+      color: #ff4d4d;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #ff1a1a;
+    }
+
+    #alreadyHaveAccount {
+      display: block;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #errorMessage {
+      color: #ff4d4d;
+    }
+  </style>
 </head>
 <body>
-  
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-6">
+      <div class="col-md-12">
         <div class="login-header">
-          <h2 class="text-center">Customer Signup</h3>
+          <h2 class="text-center">Customer Signup</h2>
         </div>
         <div class="card">
           <div class="card-header">
@@ -51,6 +147,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script src="./register_customer.js"></script>
+  <script src="./register_customer.js"></script>
 </body>
 </html>

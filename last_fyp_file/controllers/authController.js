@@ -110,7 +110,7 @@ function login(req, res) {
 
     // Update the database with the generated token
     const updateUserTokenQuery = `
-      UPDATE ${userType} SET token="${token}" WHERE email="${email}"
+      UPDATE ${userType} SET token="${token}", loginTime_current=NOW() WHERE email="${email}"
     `;
 
     db.query(updateUserTokenQuery, (error) => {
@@ -267,4 +267,44 @@ function resetPassword(req, res) {
     });
   });
 }
-module.exports = { login, changePassword, forgotPassword, resetPassword,registerAdmin };
+
+function lastLogin(req, res) {
+
+  // Find user in database by username and password
+  let email = "admin@gmail.com";
+  const updateUserLoginQuery = `
+      UPDATE admin SET loginTime_last=loginTime_current WHERE email="${email}"
+    `;
+  db.query(updateUserLoginQuery, (error, rows) => {
+    if (error) {
+      throw error;
+    }
+    if (rows.length === 0) {
+      return res
+        .status(401)
+        .json({ status: 401, message: "Invalid email or password" });
+    }
+    console.log(rows);
+    return res.status(200).json({ status: 200, result: rows[0] });
+  });
+}
+
+function getLastLogin(req, res) {
+  const lastLoginQuery = `SELECT loginTime_last FROM admin WHERE email='admin@gmail.com'`;
+  db.query(lastLoginQuery, (error, results) => {
+    if (error) {
+      console.error("Error getting last login datetime:", error);
+      res.status(500).json({ error: "Internal server error", status: 500 });
+      return;
+    }
+
+    if (results.length > 0) {
+      const lastLogin = results[0].loginTime_last;
+      res.json({ lastLogin: lastLogin, status: 200 });
+    } else {
+      res.status(404).json({ error: "Admin not found", status: 404 });
+    }
+  });
+}
+
+module.exports = { login, changePassword, forgotPassword, resetPassword,registerAdmin , lastLogin , getLastLogin};

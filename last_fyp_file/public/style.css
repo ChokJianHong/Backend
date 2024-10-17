@@ -59,7 +59,7 @@
 }
 
 .technician-list th {
-  background-color: #f9f9f9;
+  background-color: #282928;
 }
 
 .icon {
@@ -75,7 +75,7 @@ html {
 }
 
 .sidebar {
-  background-color: #707070;
+  background-color: #282928;
   padding: 20px;
   width: 250px; /* Width of the sidebar */
   height: 100%;
@@ -91,11 +91,46 @@ html {
   color: #fdfdfd;
 }
 
+.sidebar span{
+  font-size: 14px;
+  color: #fdfdfd;
+}
+
 .sidebar ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
   margin-top: 70px;
+}
+
+.sidebar ul li {
+  position: relative; /* Ensure dropdowns are positioned relative to their parent */
+}
+
+/* Hide dropdowns initially */
+.sidebar ul li ul.dropdown {
+  display: none;
+  position: relative; /* You can use absolute if you want dropdown to be outside parent */
+  
+}
+
+/* Style dropdown links */
+.sidebar ul li ul.dropdown li a {
+  
+  font-size: 16px;
+  background-color: #505050;
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+.sidebar ul li ul.dropdown li a:hover {
+  background-color: #707070;
+}
+
+.sidebar ul li span {
+  cursor: pointer; /* Make non-clickable items look interactive */
 }
 
 .sidebar ul li a {
@@ -120,26 +155,27 @@ html {
 }
 
 .sidebar ul li:nth-child(3)  {
-  color: #fdfdfd;
-  margin-left: 10px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 13px; /* Font size for "Request" */
+  
 }
 
 .sidebar ul li:nth-child(4) a {
 }
 
 .sidebar ul li:nth-child(5) {
-  
-}
-
-.sidebar ul li:nth-child(6) {
   color: #fdfdfd;
   margin-left: 10px;
   margin-top: 5px;
   margin-bottom: 5px;
-  font-size: 13px;
+  font-size: 18px; /* Font size for "Request" */
+  font-weight: bold;
+  text-transform: uppercase;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.sidebar ul li:nth-child(6) {
+  
 }
 
 .sidebar ul li:nth-child(7) a {
@@ -154,13 +190,31 @@ html {
   margin-left: 10px;
   margin-top: 5px;
   margin-bottom: 5px;
-  font-size: 13px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.sidebar ul li:nth-child(12)  {
+  color: #fdfdfd;
+  margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
 }
 
 .logout-btn {
   padding: 10px;
   width: calc(100% - 40px); /* Subtracting padding */
-  background-color: #b7b7b7; /* Bootstrap danger color */
+  background-color: #c0392b; /* Bootstrap danger color */
   color: white;
   border: none;
   border-radius: 3px;
@@ -257,7 +311,7 @@ td {
 }
 
 th {
-  background-color: #646464;
+  background-color: #282928;
   color: white;
 }
 
@@ -271,7 +325,7 @@ th {
 }
 
 .technician-list th {
-  background-color: #646464;
+  background-color: #282928;
 }
 
 tr:nth-child(even) {
@@ -681,23 +735,17 @@ button:hover {
 
 
 
+
+
 /* Container and general page styling */
 .dashboard-container {
   padding: 10px; /* Reduced padding to save space */
   margin-left: 250px;
 }
 
-.dashboard-container h1 {
-  margin-bottom: 20px; /* Reduced margin for the title */
-  text-align: center;
-  font-size: 1.8em; /* Slightly smaller title */
-}
 
-h2 {
-  text-align: center;
-  margin-top: 5px; /* Reduced space between heading and chart */
-  font-size: 1.2em; /* Slightly smaller sub-headings */
-}
+
+
 
 /* Chart styling */
 .chart-container {

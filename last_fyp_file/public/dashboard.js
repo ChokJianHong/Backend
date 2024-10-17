@@ -7,9 +7,11 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchCustomerPendingOrders();
   fetchCustomerOngoingOrders();
   fetchTechnicians();
+  fetchLastLogin();
 
   const logout = document.getElementById("logout");
   logout.addEventListener("click", () => {
+    updateLastLogin();
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
@@ -270,5 +272,77 @@ function fetchCustomerOngoingOrders() {
     })
     .catch((error) => {
       console.error("Error fetching ongoing orders:", error);
+    });
+}
+
+function updateLastLogin() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    window.location.href = "login.html";
+  }
+  fetch(`${baseUrl}/dashboarddatabase/last-login`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        window.location.href = "login.html";
+      }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((result) => {
+      const lastLoginDateTime = result.result;
+      console.log("Last login time:",lastLoginDateTime);
+
+    })
+    .catch((error) => {
+      console.error("Error updating last login time:", error);
+    });
+}
+
+function lastLoginDateTime(datetime) {
+  const countElement = document.getElementById("last-datetime");
+  countElement.textContent = datetime;
+}
+
+function fetchLastLogin() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    window.location.href = "login.html";
+  }
+  fetch(`${baseUrl}/dashboarddatabase/fetch-last-login`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        window.location.href = "login.html";
+      }
+      if (response.status === 404) {
+        console.log("404 error");
+      }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const datetime = new Date(data.lastLogin);
+      const localDate = datetime.toLocaleString();
+      lastLoginDateTime(localDate); // Call the function to update UI with count
+    })
+    .catch((error) => {
+      console.error("Error fetching last login datetime:", error);
     });
 }

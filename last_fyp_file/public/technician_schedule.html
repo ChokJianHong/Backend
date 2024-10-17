@@ -14,7 +14,7 @@
   <div class="header-content">
     <!-- Place your bell and profile icons here -->
     <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
-    <img src="images/profile.svg" alt="Profile" class="icon">
+    
   </div>
 </div>
 
@@ -23,10 +23,13 @@
   <!-- Sidebar content -->
   <ul>
     <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="technician_schedule.html">Schedule</a></li>
+    <li><a href="technician_schedule.html" class="active">Schedule</a></li>
+    <li><a href="inventory.html">Inventory</a></li>
+    <li><a href="analysis.html">Business Analysis</a></li>
     <li>Request</a></li>
     <li><a href="requests.html" id="current-requests">Current Requests</a></li>
     <li><a href="history.html">Requests History</a></li>
+    <li><a href="cancelled_history.html">Cancel History</a></li>
     <li>Profiles</a></li>
     <li><a href="technician.html">Technician</a></li>
     <li><a href="customer.html">Customer</a></li>
@@ -44,6 +47,20 @@
     <iframe src="https://calendar.google.com/calendar/embed?src=e0c350640d061d74bb08aea7a928ead37b0794753c634983161d56d00857570e%40group.calendar.google.com&ctz=Asia%2FKuala_Lumpur" style="border: 0" width="1000" height="800" frameborder="0" scrolling="no"></iframe>
   </div>
 </div>
+
+<script>
+  const links = document.querySelectorAll('.sidebar ul li a');
+
+  links.forEach(link => {
+    link.addEventListener('click', function() {
+      // Remove active class from all links
+      links.forEach(link => link.classList.remove('active'));
+      
+      // Add active class to the clicked link
+      this.classList.add('active');
+    });
+  });
+</script>
 
 <script src="script.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

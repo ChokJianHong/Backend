@@ -1,18 +1,20 @@
 /* ADMIN SIGN IN */
 
 body {
-  background-color: #646464 !important;
+  
+  background-image: url('/images/5-dots.png');
 }
 .container {
   text-align: center;
-  background-color: #646464;
+  background-image: url('/images/5-dots.png');
   position: absolute;
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 400px;
+  
 }
 .card {
+  text-align: center;
   padding-top: 50px;
   padding-left: 100px;
   padding-right: 100px;
@@ -49,4 +51,30 @@ body {
 #alreadyHaveAccount:hover {
   color: #0056b3; /* Darker blue color on hover */
   text-decoration: underline;
+}
+.custom-back-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px;
+  background-color: #646464 ;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-back-button:hover {
+  background-color: #646464 ; /* Slightly darker background on hover */
+}
+
+/* Style for the back icon */
+.custom-back-icon {
+  font-size: 24px; /* Size of the icon */
+  color: #333; /* Icon color */
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.custom-back-button:hover .custom-back-icon {
+  transform: scale(1.1); /* Scale up the icon slightly on hover */
+  color: #000; /* Change the icon color on hover */
 }

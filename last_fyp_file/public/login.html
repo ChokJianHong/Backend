@@ -1,79 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In</title>
-    <link rel="stylesheet" href="signin_style.css" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="text-center">Sign In</h3>
-            </div>
-            <div class="card-body">
-              <form action="#" method="post" id="loginForm">
-                <!-- Error message display area -->
-                <div id="errorMessage" class="my-3 text-danger"></div>
-                <div class="form-group">
-                  <select class="form-control" id="role" name="role" required>
-                    <option value="">Select Role</option>
-                    <option value="admin">admin</option>
-                    <option value="customer">customer</option>
-                    <option value="technician">technician</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="Email"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                    required
-                  />
-                </div>
-                <a id="forgotPassword" href="./forgot_password.html"
-                  >Forgot your password?</a
-                >
-                <a id="forgotPassword" href="./register_customer.html"
-                  >Or Register as new customer</a
-                >
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-block btn-signin"
-                >
-                  Login
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <!-- Google Fonts for a better font style -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url('images/back.png') repeat; /* Use the pattern image as a repeating background */
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black to blend with the pattern */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3); /* Deeper shadow for depth */
+      text-align: center;
+      animation: fadeIn 1.2s ease-in-out;
+      color: #fff;
+      overflow: visible; /* Ensure dropdown is not clipped */
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h3 {
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #ff4d4d; /* Red heading for emphasis */
+    }
+
+    .form-control {
+      position: relative; /* Ensure the dropdown is relative to the form */
+      margin-bottom: 15px;
+      padding: 12px 20px;
+      font-size: 15px;
+      border-radius: 5px;
+      background-color: #222; /* Darker input background */
+      color: #fff; /* White input text */
+      border: 1px solid #444; /* Subtle border */
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 999; /* Ensure the dropdown appears on top */
+    }
+
+    .form-control:focus {
+      border-color: #ff4d4d; /* Red border on focus */
+      box-shadow: 0px 0px 8px rgba(255, 77, 77, 0.5);
+    }
+
+    .btn {
+      padding: 12px 20px;
+      background-color: #ff4d4d; /* Red button */
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #ff1a1a; /* Darker red on hover */
+      box-shadow: 0px 5px 10px rgba(255, 77, 77, 0.3);
+    }
+
+    a {
+      color: #ff4d4d;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #ff1a1a;
+    }
+
+    .icon {
+      font-size: 60px;
+      color: #ff4d4d;
+      margin-bottom: 20px;
+    }
+    .role-selection {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.role-select {
+    width: 350px; /* Adjust width to make it smaller */
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <i class="fas fa-user-circle icon"></i> <!-- User Icon -->
+    <h3>LOG IN</h3>
+    <form id="loginForm" action="#" method="post">
+      <div class="role-selection">
+          <select class="role-select" id="role" name="role" required>
+              <option value="">Select Role</option>
+              <option value="admin">Admin</option>
+              <option value="customer">Customer</option>
+              <option value="technician">Technician</option>
+          </select>
       </div>
-    </div>
+      <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+      <a href="./forgot_password.html">Forgot your password?</a><br>
+      <a href="./register_customer.html">Or Register as a new customer</a>
+      <button type="submit" class="btn btn-block mt-4">Login</button>
+    </form>
+  </div>
 
-    <!-- Bootstrap JS and jQuery (optional) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Bootstrap JS and jQuery (optional) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script src="./login.js"></script>
-  </body>
+  <!-- Custom JavaScript -->
+  <script src="./login.js"></script>
+</body>
 </html>

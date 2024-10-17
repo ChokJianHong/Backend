@@ -14,7 +14,6 @@
   <div class="header-content">
     <!-- Place your bell and profile icons here -->
     <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
-    <img src="images/profile.svg" alt="Profile" class="icon">
   </div>
 </div>
 
@@ -24,14 +23,17 @@
   <ul>
     <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
+    <li><a href="inventory.html">Inventory</a></li>
+    <li><a href="analysis.html">Business Analysis</a></li>
     <li>Request</a></li>
     <li><a href="requests.html" id="current-requests">Current Requests</a></li>
     <li><a href="history.html">Requests History</a></li>
+    <li><a href="cancelled_history.html">Cancel History</a></li>
     <li>Profiles</a></li>
     <li><a href="technician.html">Technician</a></li>
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
-    <li><a href="banner.html">Homepage Banner</a></li>
+    <li><a href="banner.html" class="active">Homepage Banner</a></li>
     <!-- Additional links can be added here -->
   </ul>
   <button id="logout" class="logout-btn">Log Out</button>
@@ -191,6 +193,19 @@
   }
 </script>
 
+<script>
+  const links = document.querySelectorAll('.sidebar ul li a');
+
+  links.forEach(link => {
+    link.addEventListener('click', function() {
+      // Remove active class from all links
+      links.forEach(link => link.classList.remove('active'));
+      
+      // Add active class to the clicked link
+      this.classList.add('active');
+    });
+  });
+</script>
 
 <script src="./banner.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

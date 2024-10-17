@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cardBody.appendChild(completedDateText);
     cardBody.appendChild(problemTypeText);
     cardBody.appendChild(cancelDetailsText);
-    cardBody.appendChild(totalPriceText);
+    //cardBody.appendChild(totalPriceText);
     // cardBody.appendChild(viewDetailsBtn);
 
     card.appendChild(cardBody);

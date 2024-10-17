@@ -15,7 +15,7 @@
   <div class="header-content">
     <!-- Place your bell and profile icons here -->
     <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
-    <a href="profile.html"><img src="images/profile.svg" alt="Profile" class="icon"></a>
+    
   </div>
 </div>
 
@@ -25,11 +25,14 @@
   <ul>
     <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
+    <li><a href="inventory.html">Inventory</a></li>
+    <li><a href="analysis.html">Business Analysis</a></li>
     <li>Request</a></li>
     <li><a href="requests.html" id="current-requests">Current Requests</a></li>
     <li><a href="history.html">Requests History</a></li>
+    <li><a href="cancelled_history.html">Cancel History</a></li>
     <li>Profiles</a></li>
-    <li><a href="technician.html">Technician</a></li>
+    <li><a href="technician.html" class="active">Technician</a></li>
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
@@ -179,6 +182,20 @@
     </div>
   </div>
 </div>
+
+<script>
+  const links = document.querySelectorAll('.sidebar ul li a');
+
+  links.forEach(link => {
+    link.addEventListener('click', function() {
+      // Remove active class from all links
+      links.forEach(link => link.classList.remove('active'));
+      
+      // Add active class to the clicked link
+      this.classList.add('active');
+    });
+  });
+</script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>

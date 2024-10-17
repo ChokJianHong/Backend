@@ -56,6 +56,8 @@ const {
   forgotPassword,
   resetPassword,
   registerAdmin,// new_addition
+  lastLogin,
+  getLastLogin,
 } = require("../controllers/authController");
 const {
   createTechnician,
@@ -80,6 +82,8 @@ router.post("/register-admin", registerAdmin);// new_addition
 router.post("/change-password", decodeToken, changePassword);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.put("/last-login", lastLogin);
+router.get("/fetch-last-login", getLastLogin);
 // customer routes
 router.post("/customer/register", customerRegister);
 
