@@ -863,6 +863,8 @@ function viewOrdersDetail(req, res) {
       priceStatus: results[0].price_status,
       totalPrice: results[0].total_price,
       ProblemType: results[0].problem_type,
+      CustomerID: results[0].customer_id,
+      TechnicianID: results[0].technician_id,
       customer: {
         name: results[0].customer_name,
         address: results[0].customer_address,
