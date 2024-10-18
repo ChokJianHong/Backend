@@ -12,6 +12,8 @@
   
 <div class="header">
   <div class="header-content">
+    <span>Last login: <span class="datetime" id="last-datetime"></span></span>
+    <ul>
     <!-- Place your bell and profile icons here -->
     <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
     
@@ -20,28 +22,31 @@
 
 
 <div class="sidebar">
+  <!-- Add Logo at the top of sidebar -->
+  <div class="logo-container">
+    <a href="dashboard.html"><img src="images/logo.png" alt="AutoSecure Logo" class="sidebar-logo"></a>
+  </div>
+
   <!-- Sidebar content -->
-  <span>Last login: <span class="datetime" id="last-datetime"></span></span>
+
   <ul>
     <li><a href="dashboard.html" class="active">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
     <li><a href="inventory.html">Inventory</a></li>
     <li><a href="analysis.html">Business Analysis</a></li>
     <li>Request</li>
-      
     <li><a href="requests.html" id="current-requests">Current Requests</a></li>
     <li><a href="history.html">Requests History</a></li>
     <li><a href="cancelled_history.html">Cancel History</a></li>
-      
     <li>Profiles</a></li>
     <li><a href="technician.html">Technician</a></li>
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
-    <!-- Additional links can be added here -->
   </ul>
   <button id="logout" class="logout-btn">Log Out</button>
 </div>
+
 
 <!-- Rest of your dashboard content -->
 

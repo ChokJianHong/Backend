@@ -76,7 +76,7 @@ html {
 
 .sidebar {
   background-color: #282928;
-  padding: 20px;
+  padding: 10px;
   width: 250px; /* Width of the sidebar */
   height: 100%;
   position: fixed;
@@ -100,7 +100,7 @@ html {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  margin-top: 70px;
+  margin-top: 30px;
 }
 
 .sidebar ul li {
@@ -745,16 +745,23 @@ button:hover {
 
 
 
-
-
 /* Chart styling */
+/* Chart row with gap between chart containers */
+
+
+
+.col-md-6.chart-container {
+  background-color: #2e3446;
+ 
+  color: white; /* Ensure text color is white */
+}
 .chart-container {
   background-color: #2e3446;
   border-radius: 15px;
   padding: 10px; /* Reduced padding inside each chart container */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 15px; /* Reduced margin between chart containers */
-  width: 48%; /* Two charts side by side, with space for a gap */
+  box-shadow: 0px 4px 12px white;
+  margin-bottom: 10px; /* Reduced margin between chart containers */
+  width: 100%; /* Default to full width */
 }
 
 /* Make sure rows are spaced properly */
@@ -762,22 +769,27 @@ button:hover {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  margin-bottom: 20px; /* Reduced space between rows */
+  margin-bottom: 10px; /* Reduced space between rows */
 }
 
-/* Responsive behavior for chart containers */
-@media (min-width: 768px) {
+/* Canvas for the charts */
+.chart-container canvas {
+  width: 100%; /* Default to full width of the container */
+  height: 300px; /* Set a default height for charts */
+}
+
+/* Responsive behavior for larger screens */
+@media (min-width: 992px) {
   .chart-container {
-    width: 48%; /* Ensure two charts fit side by side on larger screens */
+    width: 30%; /* Make charts smaller on larger screens */
+  }
+
+  .chart-container canvas {
+    height: 250px; /* Limit canvas height on larger screens */
   }
 }
 
-.chart-container canvas {
-  max-width: 100%;
-  height: 250px; /* Reduced height to fit more content on the page */
-}
-
-/* Additional styling for small screens */
+/* Responsive behavior for smaller screens */
 @media (max-width: 768px) {
   .chart-container {
     width: 100%; /* Charts will stack vertically on smaller screens */
@@ -787,4 +799,28 @@ button:hover {
   .chart-container canvas {
     height: 150px; /* Further reduce the height on small screens */
   }
+}
+
+
+/* Styling for the chart container with white text */
+
+
+
+
+
+
+
+
+
+.logo-container {
+  text-align: center;
+  
+}
+
+.sidebar-logo {
+  width: 120px; /* Adjust logo size */
+  height: 120px; /* Ensure height matches width for a perfect circle */
+  border-radius: 50%; /* Make the logo round */
+  object-fit: cover; /* Ensure the logo fits nicely in the round shape */
+  border: 5px solid white; /* Add white border around the logo */
 }
