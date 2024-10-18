@@ -17,6 +17,7 @@ const {
   getCustomerById,
   updateCustomer,
   deleteCustomer,
+  getCustomer
 } = require("../controllers/customerController");
 
 const router = express.Router();
@@ -86,6 +87,7 @@ router.put("/last-login", lastLogin);
 router.get("/fetch-last-login", getLastLogin);
 // customer routes
 router.post("/customer/register", customerRegister);
+router.get("/technician/customersDetail/:id", getCustomer);
 
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);

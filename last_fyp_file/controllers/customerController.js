@@ -80,6 +80,53 @@ function getCustomerById(req, res) {
   });
 }
 
+function getCustomer(req, res) {
+  const customerId = req.params.id;
+
+  const dbQuery = `
+    SELECT 
+      c.customer_id,
+      c.name AS customer_name,
+      c.location AS customer_address,
+      c.phone_number AS customer_phone_number,
+      c.email AS customer_email,
+      c.auto_gate_brand AS customer_auto_gate_brand,
+      c.alarm_brand AS customer_alarm_brand,
+      c.warranty AS customer_warranty
+    FROM 
+      customer c
+    WHERE 
+      c.customer_id = ${customerId}
+  `;
+
+  db.query(dbQuery, (error, results) => {
+    if (error) {
+      console.error("Error executing database query:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Customer not found", status: 404 });
+    }
+
+    // Structuring customer details similarly to the order detail
+    const customerDetails = {
+      customerId: results[0].customer_id,
+      name: results[0].customer_name,
+      address: results[0].customer_address,
+      phone: results[0].customer_phone_number,
+      email: results[0].customer_email,
+      autogateBrand: results[0].customer_auto_gate_brand,
+      alarmBrand: results[0].customer_alarm_brand,
+      warranty: results[0].customer_warranty,
+    };
+
+    return res.status(200).json({ status: 200, data: customerDetails });
+  });
+}
+
+
+
 function updateCustomer(req, res) {
   const customerId = req.params.id;
   const {
@@ -147,4 +194,5 @@ module.exports = {
   getCustomerById,
   updateCustomer,
   deleteCustomer,
+  getCustomer
 };
