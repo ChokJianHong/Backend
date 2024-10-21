@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <h5 class="card-title">${item.name}</h5>
               <p class="card-text"><strong>Features:</strong> ${item.features}</p>
               <p class="card-text"><strong>Stock Amount:</strong> ${item.stockAmount}</p>
+               <p class="card-text"><strong>Price:</strong> ${item.price}</p>
               <button class="btn btn-warning btn-sm" onclick="editItem(${item.id})">Edit</button>
               <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Delete</button>
             </div>
@@ -52,16 +53,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const name = document.getElementById('name').value;
     const image = document.getElementById('image').value;
     const features = document.getElementById('features').value
-    const stockAmount = document.getElementById('stockAmount').value;
+    const stockAmount = document.getElementById('stockAmount').value
+    const price = document.getElementById('price').value;
 
     try {
-      console.log(name, image, features, stockAmount);
+      console.log(name, image, features, stockAmount,price);
 
       // Send POST request to API
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: reqHeader,
-        body: JSON.stringify({ name, image, features, stockAmount })
+        body: JSON.stringify({ name, image, features, stockAmount,price })
       });
 
       // Check if the request was successful
@@ -69,7 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('#name').value = '';
         document.querySelector('#image').value = '';
         document.querySelector('#features').value = '';
-        document.querySelector('#stockAmount').value = '';
+        document.querySelector('#stockAmount').value = ''; 
+        document.querySelector('#price').value = '';
 
         // Show success popup or alert
         Swal.fire({
@@ -103,6 +106,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('e_image').value = item.image;
         document.getElementById('e_features').value = item.features
         document.getElementById('e_stockAmount').value = item.stockAmount;
+        
+        document.getElementById('e_price').value = item.price;
         document.getElementById('e_item_id').value = item.id; // Set hidden ID field
 
         // Scroll to the top of the page where the form is located
@@ -124,12 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const image = document.getElementById('e_image').value;
     const features = document.getElementById('e_features').value.split(',').map(f => f.trim());
     const stockAmount = document.getElementById('e_stockAmount').value;
+    const price = document.getElementById('e_price').value;
 
     try {
       const response = await fetch(`${apiUrl}/${id}`, {
         method: 'PUT',  // Assuming the API expects a PUT request for updating
         headers: reqHeader,
-        body: JSON.stringify({ name, image, features, stockAmount })
+        body: JSON.stringify({ name, image, features, stockAmount ,price})
       });
 
       if (response.ok) {
@@ -138,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('e_image').value = ""
         document.getElementById('e_features').value = ""
         document.getElementById('e_stockAmount').value = ""
+        document.getElementById('e_price').value = ""
         document.getElementById('e_item_id').value = "" // Set hidden ID field
         fetchInventoryItems();  // Refresh the list after updating
         Swal.fire({
