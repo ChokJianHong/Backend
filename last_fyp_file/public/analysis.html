@@ -78,6 +78,19 @@
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
       // Fetch order status statistics
       function fetchOrderStatusStatistics() {
           const url = `${baseUrl}/orders/status-stats`;
@@ -163,7 +176,13 @@
         }
     });
 }
-  // Fetch completed order sales statistics
+
+
+
+
+
+
+// Fetch completed order sales statistics
 function fetchCompletedOrderSales() {
     const url = `${baseUrl}/orders/completed-sales-stats`;
     const token = localStorage.getItem("token");
@@ -187,70 +206,63 @@ function fetchCompletedOrderSales() {
         return response.json();
     })
     .then(data => {
-        displayCompletedOrderSalesChart(data);
+        displayCompletedOrderSalesChartWithRegression(data);
     })
     .catch(error => console.error('Error fetching completed order sales data:', error));
 }
 
+// Perform Linear Regression for prediction
+function performLinearRegression(x, y) {
+    const n = x.length;
+    const sumX = x.reduce((acc, val) => acc + val, 0);
+    const sumY = y.reduce((acc, val) => acc + val, 0);
+    const sumXY = x.reduce((acc, val, i) => acc + (val * y[i]), 0);
+    const sumX2 = x.reduce((acc, val) => acc + (val * val), 0);
 
-// Function to calculate simple moving average (SMA) for the last X months
-function calculateSimpleMovingAverage(data, numberOfMonths) {
-    if (data.length < numberOfMonths) {
-        return 0; // Not enough data to calculate the moving average
-    }
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
 
-    // Get the last X months of data
-    const relevantData = data.slice(-numberOfMonths);
-
-    // Calculate the average of the last X months
-    const sum = relevantData.reduce((acc, value) => acc + value, 0);
-    const average = sum / numberOfMonths;
-
-    return average; // Return the average
+    console.log(`Regression Slope: ${slope}, Intercept: ${intercept}`);
+    return { slope, intercept };
 }
 
-// Function to display completed order sales chart with simple moving average prediction
-function displayCompletedOrderSalesChart(data) {
+// Display chart with Linear Regression prediction
+function displayCompletedOrderSalesChartWithRegression(data) {
     const months = [];
     const totalPrices = [];
 
     // Extract months and total prices from data
     data.slice(1).forEach(row => {
         months.push(row[0]);         // Month
-        totalPrices.push(row[2]);    // Total price
+        totalPrices.push(parseFloat(row[2]));    // Total price, make sure to parse as float
     });
 
-    console.log("Extracted Months:", months);
-    console.log("Extracted Total Prices:", totalPrices);
+    // Ensure valid data is being used
+    console.log("Months:", months);
+    console.log("Total Prices:", totalPrices);
 
-    // Check if we have enough data to calculate the simple moving average
-    const lastXMonths = 3; // You can change this value to consider more months for the moving average
-    if (totalPrices.length < lastXMonths) {
-        console.error("Not enough data to calculate predictions");
-        return;
-    }
+    // Convert months to numeric values (1 for the first month, 2 for the second month, etc.)
+    const numericMonths = months.map((_, index) => index + 1);
 
-    // Calculate the simple moving average for the last X months
-    const averagePrice = calculateSimpleMovingAverage(totalPrices, lastXMonths);
-    console.log("Calculated Simple Moving Average:", averagePrice);
+    // Perform Linear Regression
+    const regressionResult = performLinearRegression(numericMonths, totalPrices);
 
-    // Generate future months
-    const futureMonths = getNextMonths(months[months.length - 1], 12); // Predict next 12 months
+    // Predict future prices based on the linear regression
+    const futureMonths = getNextMonths(months[months.length - 1], 12);
+    const futureNumericMonths = futureMonths.map((_, index) => numericMonths.length + index + 1);
+    const predictedPrices = futureNumericMonths.map(month => regressionResult.slope * month + regressionResult.intercept);
 
-    // Use the simple moving average for prediction
-    const predictions = futureMonths.map(() => averagePrice); // Use the average price for predictions
+    // Cap negative predictions at zero (since negative sales don't make sense)
+    const cappedPredictedPrices = predictedPrices.map(price => Math.max(price, 0));
 
-    // Get the canvas context for the chart
-    const ctx = document.getElementById('completedOrderSalesChart');
-    if (!ctx) {
-        console.error("Canvas element not found!"); // Check if canvas exists
-        return;
-    }
+    console.log("Predicted Prices:", cappedPredictedPrices);
 
-    new Chart(ctx.getContext('2d'), {
-        type: 'line', // Use line chart for both actual and predicted values
+    // Plot chart using Chart.js
+    const ctx = document.getElementById('completedOrderSalesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
         data: {
-            labels: [...months, ...futureMonths],  // X-axis labels (Months)
+            labels: [...months, ...futureMonths],  // Combine actual and future months
             datasets: [
                 {
                     label: 'Total Price (Actual)',
@@ -263,7 +275,7 @@ function displayCompletedOrderSalesChart(data) {
                 },
                 {
                     label: 'Predicted Total Price',
-                    data: [...new Array(months.length).fill(null), ...predictions], // Predictions for future months
+                    data: [...new Array(months.length).fill(null), ...cappedPredictedPrices], // Predictions for future months
                     backgroundColor: 'rgba(75, 192, 192, 0.6)', // Different color for prediction
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
@@ -305,6 +317,22 @@ function getNextMonths(lastMonth, numMonths) {
 
     return result;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
