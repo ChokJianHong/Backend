@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById("loginForm");
     const errorMessage = document.getElementById("errorMessage");
 
+    // Hide the error message initially
+    errorMessage.style.display = "none";
+
     // Get form data
     const formData = new FormData(loginForm);
     const userType = formData.get("role");
@@ -27,12 +30,21 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       body: jsonData, // Send the JSON data in the body
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          // If the response is not OK, handle it as a failed login
+          return response.json().then((data) => {
+            throw new Error(data.message || "Login failed.");
+          });
+        }
+        return response.json();
+      })
       .then((data) => {
-        console.log(data);
-        if (data.status === 200 && data.token) {
+        if (data.token) {
+          // Save token to local storage
           localStorage.setItem("token", data.token);
 
+          // Determine redirect URL based on user role
           let redirectUrl = "";
           if (userType === "admin") {
             redirectUrl = "dashboard.html";
@@ -42,14 +54,13 @@ document.addEventListener("DOMContentLoaded", function () {
             redirectUrl = "technician_dashboard.html";
           }
           window.location.href = redirectUrl;
-        } else {
-          // Handle failed login
-          errorMessage.textContent = data.message;
-          console.error("Login failed:", data.message);
         }
       })
       .catch((error) => {
-        console.error("Error logging in:", error);
+        // Display the error message
+        errorMessage.textContent = error.message || "An error occurred during login.";
+        errorMessage.style.display = "block";
+        console.error("Login error:", error);
       });
   });
 });

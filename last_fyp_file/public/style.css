@@ -100,7 +100,7 @@ html {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .sidebar ul li {
@@ -818,8 +818,8 @@ button:hover {
 }
 
 .sidebar-logo {
-  width: 120px; /* Adjust logo size */
-  height: 120px; /* Ensure height matches width for a perfect circle */
+  width: 110px; /* Adjust logo size */
+  height: 110px; /* Ensure height matches width for a perfect circle */
   border-radius: 50%; /* Make the logo round */
   object-fit: cover; /* Ensure the logo fits nicely in the round shape */
   border: 5px solid white; /* Add white border around the logo */

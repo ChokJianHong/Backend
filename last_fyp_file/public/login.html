@@ -103,18 +103,19 @@
       color: #ff4d4d;
       margin-bottom: 20px;
     }
-    .role-selection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-}
 
-.role-select {
-    width: 350px; /* Adjust width to make it smaller */
-    padding: 5px;
-    font-size: 14px;
-    border-radius: 5px;
-}
+    .role-selection {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .role-select {
+      width: 350px; /* Adjust width to make it smaller */
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+    }
 
   </style>
 </head>
@@ -136,6 +137,9 @@
       <a href="./forgot_password.html">Forgot your password?</a><br>
       <a href="./register_customer.html">Or Register as a new customer</a>
       <button type="submit" class="btn btn-block mt-4">Login</button>
+
+      <!-- Error message div -->
+      <div id="errorMessage" style="color: red; margin-top: 10px; display: none;"></div>
     </form>
   </div>
 
