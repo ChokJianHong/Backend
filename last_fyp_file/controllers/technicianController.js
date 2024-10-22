@@ -79,7 +79,7 @@ function getTechnicianById(req, res) {
   const { type } = req.user;
   const technicianId = req.params.id;
 
-  if (type !== "admin") {
+  if (type !== "admin" && type !== "technician") {
     return res.status(401).json({ message: "Unauthorized", status: 401 });
   }
   const query = `SELECT * FROM technician WHERE technician_id = ${technicianId}`;
@@ -94,6 +94,8 @@ function getTechnicianById(req, res) {
     return res.status(200).json({ technician: technician, status: 200 });
   });
 }
+
+
 
 function updateTechnician(req, res) {
   const { type } = req.user;
