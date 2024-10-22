@@ -193,43 +193,58 @@ function forgotPassword(req, res) {
   const { email, userType } = req.body;
   let forgotPasswordQuery = "";
 
+  // Construct the correct query based on the user type
   if (userType === "customer") {
     forgotPasswordQuery = `SELECT * FROM customer WHERE email="${email}"`;
   } else if (userType === "technician") {
     forgotPasswordQuery = `SELECT * FROM technician WHERE email="${email}"`;
   }
 
+  // Execute the query
   db.query(forgotPasswordQuery, (error, rows) => {
     if (error) {
-      throw error;
+      return res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
+
+    // If no user is found, respond with an error
     if (rows.length === 0) {
       return res.status(401).json({ message: "Invalid email" });
     }
+
+    // Get the user's email from the database query result
+    const userEmail = rows[0].email;  // This is the dynamic email from the database
+
+    // Generate a unique token
     const token = uuid();
     console.log(token);
+
+    // Create the mail options with the dynamic email
     let mailOptions = {
-      from: process.env.MAIL_USERNAME,
-      to: "zainabyousaf171.com", // email testing purpose, should be from db
+      from: process.env.MAIL_USERNAME,  // Sender's email
+      to: userEmail,  // Use the email from the database
       subject: "Password Reset Link",
-      text: `Hey, click on the link below to reset your password, http://localhost:5005/reset_password.html?user=${userType}&email=${email}&token=${token}`,
+      text: `Hey, click on the link below to reset your password: http://localhost:5005/reset_password.html?user=${userType}&email=${userEmail}&token=${token}`,
     };
 
+    // Send the reset email
     sendEmail(mailOptions);
+
+    // Update the user's token in the database
     db.query(
-      `UPDATE customer SET token="${token}" WHERE email="${email}"`,
+      `UPDATE ${userType} SET token="${token}" WHERE email="${userEmail}"`,  // Dynamically update token based on userType
       (error, rows) => {
         if (error) {
-          throw error;
+          return res.status(500).json({ status: 500, message: "Internal Server Error" });
         }
         return res.status(200).json({
-          message: "reset-password link is sent on your email",
+          message: "Reset-password link is sent to your email",
           status: 200,
         });
       }
     );
   });
 }
+
 
 // reset password
 
@@ -239,34 +254,50 @@ function resetPassword(req, res) {
 
   let resetPasswordQuery = "";
   let setTokenNullQuery = "";
+
+  // Define queries based on user type
   if (user === "customer") {
     resetPasswordQuery = `SELECT * FROM customer WHERE email="${email}" AND token="${token}"`;
-    setTokenNullQuery = `UPDATE customer SET token = NULL,  password = "${password}" WHERE email = "${email}"`;
   } else if (user === "technician") {
-    resetPasswordQuery = `SELECT * FROM technician WHERE email = "${email}" AND token = "${token}"`;
-    setTokenNullQuery = `UPDATE technician SET token = NULL,  password = "${password}" WHERE email = "${email}"`;
+    resetPasswordQuery = `SELECT * FROM technician WHERE email="${email}" AND token="${token}"`;
   }
 
+  // Check if the token and email match in the database
   db.query(resetPasswordQuery, (error, rows) => {
     if (error) {
-      throw error;
+      return res.status(500).json({ message: "Internal server error", status: 500 });
     }
-    console.log(rows);
-    console.log(resetPasswordQuery);
+
     if (rows.length === 0) {
-      return res.status(401).json({ message: "link expired" });
+      return res.status(401).json({ message: "Link expired or invalid token", status: 401 });
     }
-    db.query(setTokenNullQuery, (error, rows) => {
-      if (error) {
-        throw error;
+
+    // Hash the new password before saving it to the database
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        console.error("Error hashing the password:", err);
+        return res.status(500).json({ message: "Error hashing the password", status: 500 });
       }
 
-      return res
-        .status(200)
-        .json({ message: "Password changed successfully", status: 200 });
+      // Update the password and clear the token in the database
+      if (user === "customer") {
+        setTokenNullQuery = `UPDATE customer SET token=NULL, password="${hashedPassword}" WHERE email="${email}"`;
+      } else if (user === "technician") {
+        setTokenNullQuery = `UPDATE technician SET token=NULL, password="${hashedPassword}" WHERE email="${email}"`;
+      }
+
+      // Execute the update query to reset the password
+      db.query(setTokenNullQuery, (error, result) => {
+        if (error) {
+          return res.status(500).json({ message: "Internal server error", status: 500 });
+        }
+
+        return res.status(200).json({ message: "Password changed successfully", status: 200 });
+      });
     });
   });
 }
+
 
 function lastLogin(req, res) {
 
