@@ -108,9 +108,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         <tr>
                             <td>${banner.banner_title}</td>
                             <td>
-                                <img src="${banner.banner_img}" class="banner_img" id="img-${banner.banner_id}">
+                                <img src="${banner.banner_img}" class="banner_img" id="img-${banner.banner_id}">                            
                                 <br>
                                 <span class="copy-link" id="copy-${banner.banner_id}" style="cursor: pointer;  background-color: white; border-radius: 5px; font-weight: bold; padding: 3px; font-size: 14px; background-color: #707070; color: white;">Copy Link+</span>
+                                <br>
+                                <span class="pixel-dimensions" id="dimensions-${banner.banner_id}">Dimensions: ${banner.banner_dimension}</span>
                             </td>
                             <td>${banner.banner_status}</td>
                             <td>
@@ -120,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </td>
                         </tr>
                     `;
-                    bannerDetails.innerHTML += row;
+                    bannerDetails.innerHTML += row;                    
             });
 
             const editButtons = document.querySelectorAll(".edit");
