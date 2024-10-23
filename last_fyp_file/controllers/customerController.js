@@ -188,11 +188,36 @@ function deleteCustomer(req, res) {
   });
 }
 
+
+function getCustomerByToken(req, res) {
+  const token = req.headers.authorization.split(" ")[1]; // Extract token from authorization header
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized", status: 401 });
+  }
+
+  const getCustomerQuery = `SELECT * FROM customer WHERE token = '${token}'`;
+  db.query(getCustomerQuery, (error, customer) => {
+    if (error) {
+      throw error;
+    }
+
+    if (customer.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Customer not found", status: 404 });
+    }
+
+    return res.status(200).json({ status: 200, data: customer[0] });
+  });
+}
+
 module.exports = {
   customerRegister,
   getAllCustomers,
   getCustomerById,
   updateCustomer,
   deleteCustomer,
-  getCustomer
+  getCustomer,
+  getCustomerByToken
 };
