@@ -81,6 +81,9 @@ document.addEventListener("DOMContentLoaded", function () {
           <p><strong>Contact Number:</strong> <span class="technician-phone" id="technician_phone">${
             result.technician.contactNumber
           }</span></p>
+          <p><strong>Start Time:</strong> <span class="technician-startTime" id="technician_start_time">${
+            result.technician.startTime
+          }</span></p>
         </div>
       </div>
       <hr>

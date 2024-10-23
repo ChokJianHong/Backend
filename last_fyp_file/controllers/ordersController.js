@@ -146,6 +146,7 @@ function viewRequestDetail(req, res) {
         name: results[0]?.technician_name || "",
         contactNumber: results[0]?.technician_phone_number || "",
         eta: results[0]?.technician_eta || "",
+        startTime: results[0]?.technician_start_time || "",
       },
       userType: type,
     };
