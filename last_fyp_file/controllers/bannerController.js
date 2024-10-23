@@ -1,4 +1,5 @@
 const db = require("../utils/database");
+const sizeOf = require('image-size');
 
 function createBanner(req, res) {
     const { userId, type } = req.user;
@@ -12,6 +13,15 @@ function createBanner(req, res) {
       req.body;
     const banner_img = req.file ? `uploads/${req.file.filename}` : null;
     const imageUrl = `http://localhost:5005/uploads/${req.file.filename}`;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
+    }
+
+    // Get image dimensions using image-size
+    const dimensions = sizeOf(req.file.path);
+    const banner_dimension = `${dimensions.width}x${dimensions.height}px`;
+
     // Check if the banner title already exists
     const checkBannerPositionQuery = `SELECT * FROM banner WHERE banner_position = '${banner_position}'`;
     db.query(checkBannerPositionQuery, (error, banners) => {
@@ -26,8 +36,8 @@ function createBanner(req, res) {
 
       // If title is unique, proceed to create the banner
       const createBannerQuery = `
-        INSERT INTO banner (banner_title, banner_img, banner_status, banner_position)
-        VALUES ('${banner_title}', '${imageUrl}', '${banner_status}', '${banner_position}')
+        INSERT INTO banner (banner_title, banner_img, banner_status, banner_position, banner_dimension)
+        VALUES ('${banner_title}', '${imageUrl}', '${banner_status}', '${banner_position}', '${banner_dimension}')
       `;
       db.query(createBannerQuery, (error, result) => {
         if (error) {
@@ -88,7 +98,7 @@ function getAllBanners(req, res) {
       status,
     } = req.body;
     const image = req.file ? `uploads/${req.file.filename}` : null;
-    const imageUrl = `http://localhost:5005/uploads/${req.file.filename}`;
+    
     const { type } = req.user;
   
     if (type === "technician") {
@@ -107,11 +117,19 @@ function getAllBanners(req, res) {
       }
 
       // If position is unique, proceed to update the banner
-      let updateBannerQuery = `UPDATE banner SET banner_title = '${title}', banner_img = '${imageUrl}', banner_position = '${position}'`;
+      let updateBannerQuery = `UPDATE banner SET banner_title = '${title}', banner_position = '${position}'`;
       updateBannerQuery = status
         ? `${updateBannerQuery}, banner_status = '${status}'`
         : updateBannerQuery;
       
+      // Only update the image if a new image is uploaded
+      if (req.file) {
+        const imageUrl = `http://localhost:5005/uploads/${req.file.filename}`;
+        updateBannerQuery += `, banner_img = '${imageUrl}'`;
+        const dimensions = sizeOf(req.file.path);
+        const banner_dimension = `${dimensions.width}x${dimensions.height}px`;
+        updateBannerQuery += `, banner_dimension = '${banner_dimension}'`;
+      }
     
         updateBannerQuery = `${updateBannerQuery} WHERE banner_id = ${bannerId}`;
         db.query(updateBannerQuery, (error, result) => {

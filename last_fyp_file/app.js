@@ -6,10 +6,12 @@ require("dotenv").config();
 const db = require('./utils/database');
 const url = require('url');
 const morgan = require("morgan");
+const cors = require('cors');
 
 const app = express();
 const port = 5005;
 app.use(morgan("dev"))
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(express.static("uploads"));
