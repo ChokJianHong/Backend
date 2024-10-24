@@ -319,6 +319,7 @@ th {
 }
 .billtable th {
   background: none !important;
+  color: black;
 }
 .billtable thead th {
   border-bottom: 1px solid #000; /* Add a solid black border at the bottom */

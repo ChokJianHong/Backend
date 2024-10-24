@@ -147,6 +147,7 @@ function viewRequestDetail(req, res) {
         contactNumber: results[0]?.technician_phone_number || "",
         eta: results[0]?.technician_eta || "",
         startTime: results[0]?.technician_start_time || "",
+        endTime: results[0]?.technician_stop_time || "",
       },
       userType: type,
     };

@@ -85,6 +85,8 @@ function renderDetail(data) {
           <p><strong>Name:</strong> <span class="technician-name">${data.technician.name}</span></p>
           <p><strong>Estimated Time of Arrival:</strong> <span class="ETA">${etaDateString}</span></p>
           <p><strong>Contact Number:</strong> <span class="technician-phone">${data.technician.contactNumber}</span></p>
+          <p><strong>Start Time:</strong> <span class="technician-startTime">${data.technician.startTime}</span></p>
+          <p><strong>End Time:</strong> <span class="technician-endTime">${data.technician.endTime}</span></p>
         </div>
         <div class="col-md-6">
           <h4>Payment Information</h4>
