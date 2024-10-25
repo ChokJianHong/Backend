@@ -1,0 +1,22 @@
+
+JWT_SECRET=thisissecret
+JWT_EXPIRY= 5h
+
+# database env
+DB_HOST=localhost
+DB_USER=root
+DB_NAME=cms
+DB_PASSWORD=
+
+
+# mail env
+MAIL_USERNAME=isakibul623@gmail.com  # Replace with your Gmail address
+OAUTH_CLIENTID=567731276730-h675fnlk58ev1e77mq6m9o39q0sh1s4g.apps.googleusercontent.com
+OAUTH_CLIENT_SECRET=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
+OAUTH_REFRESH_TOKEN=1//04JU5nObXQyZyCgYIARAAGAQSNwF-L9IreIx0D9AdnRQb0JayqInj5mUM4m7szq8v2LDOF1zN4jiOLS4DTymKjso5faS5r-LCL0o
+
+
+# google calendar env
+CREDENTIALS={"type": "service_account", "project_id": "calendar-423216", "private_key_id": "2242d07f7bc0a7b74cce8c4fda592866755ca126", "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQChfKT7HO5/RWwF\negI63yRsUyXK7XAJiUO0rQjOrORRaf0NpvlOmRp4J2NGOHfpOPbJKkamq0676xoG\nhy1j1074BehLauNfHqZfqxA4MMUH7aI/PrP1TqSRjwHEpR7WSdHKTTiJcTtYWOfN\nEdfXreVwBWP8XwhxK401uXI1xOtZ3rEQPB4uU1JOGFEBCN5GQvAPR1JfKVnDlUGP\npFPN+r/c8kK2q58A6FSTzFMWliJNJ4glt2IrUglp4R2JG63Vv9Af7WTw0RKROdUc\nv9wJpiyPSN2kPF++wnEumV+oyDuV39Ua1W8ecstr7sC+73y3EzNuRqAfald4Nosd\nSY5835MlAgMBAAECggEAJA9DfuBjwE818xYey9salMbPXFw/RZ3dXMm7uvzf4e8n\nJuaHap3lC3oOILbIze8eqmZyjtKXev5hWh5SzCXeuCMHj1mvqoSbVacK8OUxBhdy\nAKnlgOw98tPqaukNNQAYZNJwAr7iZ9S4dDIdDsgBwQ0vGcJ1zeGR/3Jo1qlhfXhS\nB6Jc673B4mAsL7RnEkdeYLB7bd/+8bD103YWgBtqYAb2oxNqOYGIFJdW1qRDUW0o\nyj3JLyAHnCmtIA/txGnOgG6u2rJx++yhTA8G+9LYGt9bEUo708BMt3vlDuTy432W\nCgNuFuAK/Rlkot1Jhw+caOBb/4QQ136IeczP19jO6QKBgQDWKKB456p1cVYI6vMC\nUaHAzOKeZyfPMuicAangg7qM3UUKoxpHGcjGvcwhKzI+6c5dYR3jeI5+SRfpr8Ha\ne/dYRsUt4zE/W8l+X1UL2kYCd8mnXQ1kgEwd6+sQSoD+OVGdv0YdYoEG1vG9Lv94\niDHmDiaLas2UGgI8R8Nys5XiuQKBgQDBCZTo5ghi96LgNZkMj8lk9mWF6oCoqc4Z\nCHRD1hfMiIQGJ42GS9PCQs0aWiNO8jYce2yWNxDMUUkFN3n9Zf32wMFVHO8zoRTP\ne8XNrEsU/J+omjWzfdIFVP6M9y6S3XNH0kcuCuyG1TU94U7+RMm0VP2VBBmyoVvL\nhjNDN7KtzQKBgQCpMBluyx64f5xHmU34VANk7LhQChDCOWbY8NuDGq6DYL+NosM8\nzpr2n7UnsxeT6mR1EydosLJqBFbW8FpGwE7tN6PJF8atVlc99hSbM4rBol72UKYm\n8tCvhtUC3sk/jorzA8xhpJNokuER45JCZ9578Ev1MqBM06tWch9ve377SQKBgQCT\nFcnw69XYEvh3/l7vw1+hHl2c/GGsIjZ3vIlaZvcbUanHRrv/aCeiDWRaf/QHY2b3\nrNPAYZTbGdSZtPuuqNgp/BVT1QguPr6smZLOdEmBZDwDK/1fFq/AgFK09mL2ZOZC\nA2dZHdm7oxk+XT7jX2aRkXDm6ojqIyjemxLUVMxAwQKBgHQhEOAXiyl/0RAMGIjm\n2GHEtTRBrNu5MLIrPk+D3TSjef9NsJY9PsntdadwdbgIevzY+aP0M5sNHLkZ72FK\nqu0kM6vUy3o220AOCvnnyc4zygAMIbyhgGS9I33UumHvq6gCZ4b3WeL33ujfejry\njIb/ecpsB26tGrz1CkwjVbUX\n-----END PRIVATE KEY-----\n", "client_email": "testing-google-calendar-api@calendar-423216.iam.gserviceaccount.com", "client_id": "116041604961686145846", "auth_uri": "https://accounts.google.com/o/oauth2/auth", "token_uri": "https://oauth2.googleapis.com/token", "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs", "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/testing-google-calendar-api%40calendar-423216.iam.gserviceaccount.com", "universe_domain": "googleapis.com"}
+CALENDAR_ID=e0c350640d061d74bb08aea7a928ead37b0794753c634983161d56d00857570e@group.calendar.google.com
+PORT=5005
