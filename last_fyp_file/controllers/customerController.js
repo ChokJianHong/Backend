@@ -92,7 +92,8 @@ function getCustomer(req, res) {
       c.email AS customer_email,
       c.auto_gate_brand AS customer_auto_gate_brand,
       c.alarm_brand AS customer_alarm_brand,
-      c.warranty AS customer_warranty
+      c.auto_gate_warranty as customer_auto_gate_warranty,
+      c.alarm_warranty as customer_alarm_warranty
     FROM 
       customer c
     WHERE 
@@ -118,7 +119,8 @@ function getCustomer(req, res) {
       email: results[0].customer_email,
       autogateBrand: results[0].customer_auto_gate_brand,
       alarmBrand: results[0].customer_alarm_brand,
-      warranty: results[0].customer_warranty,
+      autogateWarranty: results[0].customer_auto_gate_warranty,
+      alarmWarranty: results[0].customer_alarm_warranty,
     };
 
     return res.status(200).json({ status: 200, data: customerDetails });
