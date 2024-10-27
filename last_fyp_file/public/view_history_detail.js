@@ -65,9 +65,9 @@ function renderDetail(data) {
           <p><strong>Email:</strong> <span class="customer-email">${data.customer.email}</span></p>
           <p><strong>Phone No:</strong> <span class="customer-email">${data.customer.phone}</span></p>
           <p><strong>Autogate Brand:</strong> <span class="autogate-brand">${data.customer.autogateBrand}</span></p>
-          <p><strong>Autogate Warranty:</strong> <span class="customer-name">${data.customer.warranty}</span></p>
+          <p><strong>Autogate Warranty:</strong> <span class="customer-name">${data.customer.autogateWarranty}</span></p>
           <p><strong>Alarm Brand:</strong> <span class="autogate-brand">${data.customer.alarmBrand}</span></p>
-          <p><strong>Alarm Warranty:</strong> <span class="customer-name">${data.customer.warranty}</span></p>
+          <p><strong>Alarm Warranty:</strong> <span class="customer-name">${data.customer.alarmWarranty}</span></p>
         </div>
         <div class="col-md-6">
           <h4>Request Information</h4>

@@ -70,7 +70,8 @@ function viewRequestDetail(req, res) {
     c.email as customer_email,
     c.auto_gate_brand as customer_auto_gate_brand,
     c.alarm_brand as customer_alarm_brand,
-    c.warranty as customer_warranty
+    c.auto_gate_warranty as customer_auto_gate_warranty
+    c.alarm_warranty as customer_alarm_warranty
     FROM 
     ordertable
     JOIN 
@@ -88,7 +89,8 @@ function viewRequestDetail(req, res) {
     c.email as customer_email,
     c.auto_gate_brand as customer_auto_gate_brand,
     c.alarm_brand as customer_alarm_brand,
-    c.warranty as customer_warranty, 
+    c.auto_gate_warranty as customer_auto_gate_warranty,
+    c.alarm_warranty as customer_alarm_warranty,
     t.name AS technician_name,
     t.phone_number AS technician_phone_number,
     t.specialization AS technician_specialization
@@ -140,7 +142,8 @@ function viewRequestDetail(req, res) {
         phone: results[0].customer_phone_number,
         autogateBrand: results[0].customer_auto_gate_brand,
         alarmBrand: results[0].customer_alarm_brand,
-        warranty: results[0].customer_warranty,
+        autogateWarranty: results[0].customer_auto_gate_warranty,
+        alarmWarranty: results[0].customer_alarm_warranty,
       },
       technician: {
         name: results[0]?.technician_name || "",
@@ -169,7 +172,8 @@ function getOrderDetail(req, res) {
       c.email as customer_email,
       c.auto_gate_brand as customer_auto_gate_brand,
       c.alarm_brand as customer_alarm_brand,
-      c.warranty as customer_warranty
+      c.auto_gate_warranty as customer_auto_gate_warranty,
+      c.alarm_warranty as customer_alarm_warranty
     FROM 
       ordertable
     JOIN 
@@ -224,7 +228,8 @@ function getOrderDetail(req, res) {
         phone: results[0].customer_phone_number,
         autogateBrand: results[0].customer_auto_gate_brand,
         alarmBrand: results[0].customer_alarm_brand,
-        warranty: results[0].customer_warranty,
+        autogateWarranty: results[0].customer_auto_gate_warranty,
+        alarmWarranty: results[0].customer_alarm_warranty,
       },
       technician: {
         name: results[0]?.technician_name || "",
@@ -246,7 +251,7 @@ function declineOrder(req, res) {
 
   const { id } = req.params;
   const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
-  db.query(declineOrderQuery, (error, rows) => {
+  db.query(declineOrderQuery, (error) => {
     if (error) {
       throw error;
     }
@@ -828,7 +833,8 @@ function viewOrdersDetail(req, res) {
       c.email as customer_email,
       c.auto_gate_brand as customer_auto_gate_brand,
       c.alarm_brand as customer_alarm_brand,
-      c.warranty as customer_warranty
+      c.auto_gate_warranty as customer_auto_gate_warranty,
+      c.alarm_warranty as customer_alarm_warranty
       
     FROM 
       ordertable
@@ -874,7 +880,8 @@ function viewOrdersDetail(req, res) {
         phone: results[0].customer_phone_number,
         autogateBrand: results[0].customer_auto_gate_brand,
         alarmBrand: results[0].customer_alarm_brand,
-        warranty: results[0].customer_warranty,
+        autogateWarranty: results[0].customer_auto_gate_warranty,
+        alarmWarranty: results[0].customer_alarm_warranty,
       },
     };
 
