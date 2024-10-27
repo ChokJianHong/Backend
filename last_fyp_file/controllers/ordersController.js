@@ -26,12 +26,14 @@ function createOrder(req, res) {
       return res.status(500).json({ message: "Failed to create order" });
     }
 
-    return res.status(201).json({ message: "Order created successfully" });
+    return res.status(201).json({ message: "success" });
   });
 }
 
+
+
 function deleteOrder(req, res) {
-  
+
   const { id } = req.params;
 
   // Use string interpolation to build the query // new_addition 
@@ -133,7 +135,7 @@ function viewRequestDetail(req, res) {
       problem:
         (results[0]?.technician_specialization &&
           results[0].technician_specialization[0].toUpperCase() +
-            results[0].technician_specialization.substring(1)) ||
+          results[0].technician_specialization.substring(1)) ||
         "",
       customer: {
         name: results[0].customer_name,
@@ -219,7 +221,7 @@ function getOrderDetail(req, res) {
       problem:
         (results[0]?.technician_specialization &&
           results[0].technician_specialization[0].toUpperCase() +
-            results[0].technician_specialization.substring(1)) ||
+          results[0].technician_specialization.substring(1)) ||
         "",
       customer: {
         name: results[0].customer_name,
@@ -344,10 +346,13 @@ function invoiceOrder(req, res) {
 
 function markOrderCompleted(req, res) {
   const orderId = req.params.id;
-  const order_done_date = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const order_date = now.toISOString().slice(0, 10).split("T")[0];
+  const order_time = now.toTimeString().slice(0, 8);
+
   const order_img = req.file ? `uploads/${req.file.filename}` : null;
   const pricing_detail = req.body.pricing_detail;
-  const updateOrderQuery = `UPDATE ordertable SET price_details = '${pricing_detail}', order_status = 'completed', order_done_date = '${order_done_date}', order_done_img = '${order_img}' WHERE order_id = ${orderId}`;
+  const updateOrderQuery = `UPDATE ordertable SET order_status = 'completed',  order_done_img = '${order_img}', order_done_date = '${order_date}', technician_stop_time = '${order_time}' WHERE order_id = ${orderId}`;
   db.query(updateOrderQuery, (error, results) => {
     if (error) {
       console.error("Error executing database query:", error);
@@ -385,9 +390,9 @@ function createReview(req, res) {
   const {
     rating,
     reviewText,
-    
+
   } = req.body;
-  
+
   const { type } = req.user;
 
   if (type === "technician") {
@@ -396,28 +401,28 @@ function createReview(req, res) {
 
   const now = new Date();
   const review_date = now.toISOString().slice(0, 10).split("T")[0];
-  
+
   let createReviewQuery = `UPDATE ordertable SET rating = '${rating}', review_text = '${reviewText}'`;
   createReviewQuery = review_date
     ? `${createReviewQuery}, review_date = '${review_date}'`
     : createReviewQuery;
-  
 
-    createReviewQuery = `${createReviewQuery} WHERE order_id = ${orderId}`;
-    db.query(createReviewQuery, (error, result) => {
-      if (error) {
-        throw error;
-      }
-  
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Review not found" });
-      }
-  
-      return res
-        .status(200)
-        .json({ message: "Review updated successfully", status: 200 });
-    });
-  
+
+  createReviewQuery = `${createReviewQuery} WHERE order_id = ${orderId}`;
+  db.query(createReviewQuery, (error, result) => {
+    if (error) {
+      throw error;
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Review updated successfully", status: 200 });
+  });
+
 }
 
 function getOrdersCountByStatus(status) {
@@ -521,7 +526,7 @@ function viewAllOrders(req, res) {
 }
 
 // new_addition 
-function viewCancelledOrderHistory(req, res){
+function viewCancelledOrderHistory(req, res) {
   const { type } = req.user;
 
   // Check if the user is an admin
@@ -588,7 +593,7 @@ function viewCompletedOrderHistory(req, res) {
   if (type !== "admin") {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   let completedOrderQuery =
     "SELECT o.*, t.name AS technician_name FROM ordertable o INNER JOIN technician t ON o.technician_id = t.technician_id";
 
@@ -622,7 +627,7 @@ function viewProblemStatistics(req, res) {
 
   // Check if the user is an admin
   if (type !== "admin") {
-      return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   // SQL query to count problem types grouped by month
@@ -644,33 +649,33 @@ function viewProblemStatistics(req, res) {
 
   // Execute the query
   db.query(problemStatsQuery, (error, rows) => {
-      if (error) {
-          console.error("Error fetching problem statistics:", error);
-          return res.status(500).json({ message: "Internal Server Error" });
+    if (error) {
+      console.error("Error fetching problem statistics:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    // Format the data for Google Charts
+    const formattedData = [['Month', 'Alarm', 'Autogate']];
+    const monthMap = new Map();
+
+    rows.forEach(row => {
+      if (!monthMap.has(row.month)) {
+        monthMap.set(row.month, { alarm: 0, autogate: 0 });
       }
+      if (row.problem_type === 'alarm') {
+        monthMap.get(row.month).alarm = row.problem_count;
+      } else if (row.problem_type === 'autogate') {
+        monthMap.get(row.month).autogate = row.problem_count;
+      }
+    });
 
-      // Format the data for Google Charts
-      const formattedData = [['Month', 'Alarm', 'Autogate']];
-      const monthMap = new Map();
+    // Convert the Map into an array suitable for Google Charts
+    monthMap.forEach((value, key) => {
+      formattedData.push([key, value.alarm, value.autogate]);
+    });
 
-      rows.forEach(row => {
-          if (!monthMap.has(row.month)) {
-              monthMap.set(row.month, { alarm: 0, autogate: 0 });
-          }
-          if (row.problem_type === 'alarm') {
-              monthMap.get(row.month).alarm = row.problem_count;
-          } else if (row.problem_type === 'autogate') {
-              monthMap.get(row.month).autogate = row.problem_count;
-          }
-      });
-
-      // Convert the Map into an array suitable for Google Charts
-      monthMap.forEach((value, key) => {
-          formattedData.push([key, value.alarm, value.autogate]);
-      });
-
-      // Return the formatted data
-      res.json(formattedData);
+    // Return the formatted data
+    res.json(formattedData);
   });
 }
 
@@ -680,7 +685,7 @@ function viewOrderStatusStatistics(req, res) {
 
   // Check if the user is an admin
   if (type !== "admin") {
-      return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   // SQL query to count order statuses grouped by month
@@ -701,35 +706,35 @@ function viewOrderStatusStatistics(req, res) {
 
   // Execute the query
   db.query(orderStatusQuery, (error, rows) => {
-      if (error) {
-          console.error("Error fetching order status statistics:", error);
-          return res.status(500).json({ message: "Internal Server Error" });
+    if (error) {
+      console.error("Error fetching order status statistics:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    // Format the data for Google Charts
+    const formattedData = [['Month', 'Ongoing', 'Completed', 'Cancelled']];
+    const monthMap = new Map();
+
+    rows.forEach(row => {
+      if (!monthMap.has(row.month)) {
+        monthMap.set(row.month, { ongoing: 0, completed: 0, cancelled: 0 });
       }
+      if (row.order_status === 'ongoing') {
+        monthMap.get(row.month).ongoing = row.order_count;
+      } else if (row.order_status === 'completed') {
+        monthMap.get(row.month).completed = row.order_count;
+      } else if (row.order_status === 'cancelled') {
+        monthMap.get(row.month).cancelled = row.order_count;
+      }
+    });
 
-      // Format the data for Google Charts
-      const formattedData = [['Month', 'Ongoing', 'Completed', 'Cancelled']];
-      const monthMap = new Map();
+    // Convert the Map into an array suitable for Google Charts
+    monthMap.forEach((value, key) => {
+      formattedData.push([key, value.ongoing, value.completed, value.cancelled]);
+    });
 
-      rows.forEach(row => {
-          if (!monthMap.has(row.month)) {
-              monthMap.set(row.month, { ongoing: 0, completed: 0, cancelled: 0 });
-          }
-          if (row.order_status === 'ongoing') {
-              monthMap.get(row.month).ongoing = row.order_count;
-          } else if (row.order_status === 'completed') {
-              monthMap.get(row.month).completed = row.order_count;
-          } else if (row.order_status === 'cancelled') {
-              monthMap.get(row.month).cancelled = row.order_count;
-          }
-      });
-
-      // Convert the Map into an array suitable for Google Charts
-      monthMap.forEach((value, key) => {
-          formattedData.push([key, value.ongoing, value.completed, value.cancelled]);
-      });
-
-      // Return the formatted data
-      res.json(formattedData);
+    // Return the formatted data
+    res.json(formattedData);
   });
 }
 
@@ -742,7 +747,7 @@ function viewCompletedOrderSales(req, res) {
 
   // Check if the user is an admin
   if (type !== "admin") {
-      return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   // SQL query to get completed order counts and total price grouped by month
@@ -763,19 +768,19 @@ function viewCompletedOrderSales(req, res) {
 
   // Execute the query
   db.query(completedOrderSalesQuery, (error, rows) => {
-      if (error) {
-          console.error("Error fetching completed order sales data:", error);
-          return res.status(500).json({ message: "Internal Server Error" });
-      }
+    if (error) {
+      console.error("Error fetching completed order sales data:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
 
-      // Format the data for the chart
-      const formattedData = [['Month', 'Order Count', 'Total Price']];
-      rows.forEach(row => {
-          formattedData.push([row.month, row.order_count, row.total_price]);
-      });
+    // Format the data for the chart
+    const formattedData = [['Month', 'Order Count', 'Total Price']];
+    rows.forEach(row => {
+      formattedData.push([row.month, row.order_count, row.total_price]);
+    });
 
-      // Return the formatted data
-      res.json(formattedData);
+    // Return the formatted data
+    res.json(formattedData);
   });
 }
 
@@ -856,7 +861,7 @@ function viewOrdersDetail(req, res) {
     if (results.length === 0) {
       return res.status(404).json({ error: "Order not found", status: 404 });
     }
-    
+
     const orderDetails = {
       orderId: results[0].order_id,
       orderDate: results[0].order_date,
@@ -920,7 +925,7 @@ function getPendingOrders(req, res) {
 
 
 module.exports = {
-  
+
   viewTopSpareParts,
   viewOrderStatusStatistics,
   viewProblemStatistics,
