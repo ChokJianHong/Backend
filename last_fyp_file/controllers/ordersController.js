@@ -795,13 +795,13 @@ function viewTopSpareParts(req, res) {
 
   // SQL query to get the top 3 most occurring spare parts
   const topSparePartsQuery = `
-    SELECT 
-        spare_part, 
-        COUNT(spare_part) AS occurrences 
+     SELECT 
+        parts_needed, 
+        COUNT(parts_needed) AS occurrences 
     FROM 
-        requestspareparttable
+        request_forms
     GROUP BY 
-        spare_part
+        parts_needed
     ORDER BY 
         occurrences DESC
     LIMIT 3;
