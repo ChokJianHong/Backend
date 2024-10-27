@@ -26,7 +26,7 @@
     .container {
       width: 100%;
       max-width: 600px;
-      background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+      background-color: #222831; /* Semi-transparent black background */
       padding: 40px;
       border-radius: 10px;
       box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3); /* Shadow for depth */
@@ -45,31 +45,36 @@
       }
     }
 
-    .card-header h3, .login-header h2 {
-      color: #ff4d4d; /* Red heading for emphasis */
+    .login-header h2 {
+      color: white; /* Red heading for emphasis */
       font-weight: 600;
       text-align: center;
     }
-
-    .form-control {
+    .card-header h3{
+      color:#222831 ; /* Red heading for emphasis */
+      font-weight: 600;
+      text-align: center;
+    }
+   orm-control {
       margin-bottom: 15px;
       padding: 12px 20px;
       font-size: 15px;
       border-radius: 5px;
       background-color: #fff; /* Darker input background */
-      color: black; /* White input text */
+      color: black-; /* White input text */
       border: 1px solid #444; /* Subtle border */
       box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
 
     .form-control:focus {
-      border-color: #ff4d4d; /* Red border on focus */
-      box-shadow: 0px 0px 8px rgba(255, 77, 77, 0.5);
+      border-color: #222831; /* Red border on focus */
+      box-shadow: 0px 5px 10px rgba(34, 40, 49, 0.3); /* Equivalent of #222831 with 30% opacity */
+
     }
 
     .btn-primary {
-      background-color: #ff4d4d; /* Red button color */
+      background-color: #222831; /* Red button color */
       border: none;
       padding: 12px 20px;
       font-size: 16px;
@@ -78,19 +83,20 @@
     }
 
     .btn-primary:hover {
-      background-color: #ff1a1a; /* Darker red on hover */
-      box-shadow: 0px 5px 10px rgba(255, 77, 77, 0.3);
+      background-color: #222831; /* Darker red on hover */
+      box-shadow: 0px 5px 10px rgba(34, 40, 49, 0.3); /* Equivalent of #222831 with 30% opacity */
+
     }
 
     a {
-      color: #ff4d4d;
+      color: #222831;
       text-decoration: none;
       font-size: 14px;
       transition: color 0.3s ease;
     }
 
     a:hover {
-      color: #ff1a1a;
+      color: #222831;
     }
 
     #alreadyHaveAccount {
@@ -100,7 +106,7 @@
     }
 
     #errorMessage {
-      color: #ff4d4d;
+      color: white;
     }
   </style>
 </head>

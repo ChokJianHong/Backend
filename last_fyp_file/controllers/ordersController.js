@@ -253,7 +253,7 @@ function declineOrder(req, res) {
 
   const { id } = req.params;
   const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
-  db.query(declineOrderQuery, (error, rows) => {
+  db.query(declineOrderQuery, (error) => {
     if (error) {
       throw error;
     }
@@ -800,13 +800,13 @@ function viewTopSpareParts(req, res) {
 
   // SQL query to get the top 3 most occurring spare parts
   const topSparePartsQuery = `
-    SELECT 
-        spare_part, 
-        COUNT(spare_part) AS occurrences 
+     SELECT 
+        parts_needed, 
+        COUNT(parts_needed) AS occurrences 
     FROM 
-        requestspareparttable
+        request_forms
     GROUP BY 
-        spare_part
+        parts_needed
     ORDER BY 
         occurrences DESC
     LIMIT 3;
