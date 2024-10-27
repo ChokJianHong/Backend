@@ -7,34 +7,52 @@
  
 }
 
-/* Header styles */
-.header {
-  top: 0;
-  right: 0;
-  
-  background-color: #e9e9e9; /* Change background color as needed */
-  padding: 10px;
-  margin-left: 250px;
-}
+  /* Header Styles */
+  .header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 250px; /* Matches sidebar width if present */
+  background-color: #EEEEEE;
+    padding: 15px 20px; /* Increased padding for a cleaner look */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Soft shadow for depth */
+    border-bottom: 1px solid #222831; /* Subtle divider at bottom */
+    z-index: 10;
+    
+  }
 
-.header-content {
-  display: flex;
-  justify-content: flex-end;
-}
-#createOrderForm,
-#createReviewForm {
-  width: 50%; /* Set form width to 50% of the container */
-  padding: 20px;
+  .header-content {
+    display: flex;
+    justify-content: right; /* Spaces out items in header */
+    align-items: center; /* Aligns items vertically */
+    gap: 20px; /* Adds spacing between items */
+  }
 
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-.icon {
-  margin-left: 10px; /* Adjust margin between icons */
-  width: 50px; /* Adjust the width to your desired size */
-  height: 50px; /* Adjust the height to your desired size */
-}
+  /* Form Styles */
+  #createOrderForm,
+  #createReviewForm {
+    width: 50%; /* Set form width to 50% of the container */
+    padding: 20px;
+    background-color: #ffffff; /* White background for clarity */
+    border: 1px solid #ddd; /* Softer border color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow */
+    margin-top: 80px; /* Additional top margin for spacing */
+  }
+
+  /* Icon Styles */
+  .icon {
+    margin-left: 10px; /* Adjust margin between icons */
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease; /* Smooth transition */
+  }
+
+  .icon:hover {
+    transform: scale(1.1); /* Slightly enlarge icon on hover */
+    opacity: 0.9; /* Reduce opacity for a subtle effect */
+  }
 
 .fa-solid.fa-arrow-left{
   font-size: 50px;
@@ -59,7 +77,7 @@
 }
 
 .technician-list th {
-  background-color: #282928;
+  background-color: #222831;
 }
 
 .icon {
@@ -75,164 +93,122 @@ html {
 }
 
 .sidebar {
-  background-color: #282928;
+  background-color: #222831;
+  color: #fdfdfd;
   padding: 10px;
-  width: 250px; /* Width of the sidebar */
-  height: 100%;
+  width: 250px;
+  height: 100vh;
   position: fixed;
-  z-index: 1;
   top: 0;
   left: 0;
-  overflow-x: hidden;
   overflow-y: auto;
-}
-.sidebar p{
-  font-size: 14px;
-  color: #fdfdfd;
+  font-size: 16px; /* Set the font size for sidebar text */
 }
 
-.sidebar span{
-  font-size: 14px;
-  color: #fdfdfd;
+
+.sidebar .logo-container {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.sidebar-logo {
+  max-width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Circular logo */
+  overflow: hidden;
 }
 
 .sidebar ul {
   list-style-type: none;
   padding: 0;
-  margin: 0;
-  margin-top: 20px;
+ 
 }
 
 .sidebar ul li {
-  position: relative; /* Ensure dropdowns are positioned relative to their parent */
-}
-
-/* Hide dropdowns initially */
-.sidebar ul li ul.dropdown {
-  display: none;
-  position: relative; /* You can use absolute if you want dropdown to be outside parent */
+  position: relative;
+  margin-top: 5px;
   
 }
 
-/* Style dropdown links */
-.sidebar ul li ul.dropdown li a {
-  
-  font-size: 16px;
-  background-color: #505050;
-  color: #fff;
+.sidebar ul li a {
+  color: #fdfdfd;
+  padding: 8px;
   text-decoration: none;
+  font-size: 16px;
   display: block;
   transition: background-color 0.3s;
 }
 
-.sidebar ul li ul.dropdown li a:hover {
-  background-color: #707070;
-}
+
 
 .sidebar ul li span {
-  cursor: pointer; /* Make non-clickable items look interactive */
+  cursor: pointer;
+  font-size: 14px;
 }
 
-.sidebar ul li a {
-  padding: 10px;
-  text-decoration: none;
-  font-size: 18px;
-  color: #fdfdfd;
-  display: block;
-  transition: background-color 0.3s; /* Adds a transition effect */
-}
-
-.sidebar ul li a.active,
-.sidebar ul li a:hover {
-  background-color: #ddd;
-}
-
-.sidebar ul li:nth-child(1) a {
-}
-
-.sidebar ul li:nth-child(2) {
-  
-}
-
-.sidebar ul li:nth-child(3)  {
-  
-}
-
-.sidebar ul li:nth-child(4) a {
-}
-
-.sidebar ul li:nth-child(5) {
-  color: #fdfdfd;
-  margin-left: 10px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 18px; /* Font size for "Request" */
-  font-weight: bold;
-  text-transform: uppercase;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  padding: 10px 0;
-}
-
-.sidebar ul li:nth-child(6) {
-  
-}
-
-.sidebar ul li:nth-child(7) a {
-}
-
-.sidebar ul li:nth-child(8) {
-  
-}
-
-.sidebar ul li:nth-child(9)  {
-  color: #fdfdfd;
-  margin-left: 10px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+.sidebar ul li:nth-child(5),
+.sidebar ul li:nth-child(9),
+.sidebar ul li:nth-child(12) {
   font-size: 18px;
   font-weight: bold;
   text-transform: uppercase;
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
-  padding: 10px 0;
-}
-
-.sidebar ul li:nth-child(12)  {
+  padding: 8px 0;
   color: #fdfdfd;
-  margin-left: 10px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 18px;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  padding: 10px 0;
+  margin-left: 5px;
 }
 
 .logout-btn {
+  width: 90%;
+  background-color: #2b3442;
+  color: #ffffff;
+  font-weight: bold;
   padding: 10px;
-  width: calc(100% - 40px); /* Subtracting padding */
-  background-color: #c0392b; /* Bootstrap danger color */
-  color: white;
-  border: none;
-  border-radius: 3px;
+  border: 2px solid white; /* Red border for emphasis */
+  border-radius: 8px;
   cursor: pointer;
-  transition: opacity 0.3s; /* Adds a transition effect */
-  margin-top: auto; /* Pushes the button to the bottom */
+  transition: all 0.3s ease;
+  margin: 15px auto 0 auto;
+  display: block;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+}
+
+.logout-btn:hover {
+  background-color: 222831; /* Changes background to red on hover */
+  color: #fff;
+  border-color: white;
+  box-shadow: 0px 5px 12px rgba(255, 77, 77, 0.5); /* Red shadow on hover */
 }
 
 .logout-btn:hover {
   opacity: 0.8;
 }
+.sidebar ul li a {
+  color: #fdfdfd;
+  padding: 5px;
+  text-decoration: none;
+  font-size: 18px;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+/* Keeps the current page link purple */
+.sidebar ul li a.active {
+  background-color: #41336D; /* Background color for active link */
+  color: #ffffff; /* White text on active link */
+}
 
 .dashboard-container {
-  margin-left: 250px; /* Must be equal to the width of the sidebar */
-  padding: 20px;
-  background-color: #e9e9e9;
-  min-height: 100vh;
+  margin-left: 250px; /* Aligns with sidebar width */
+  margin-top: 20px; /* Adds slight gap between header and content */
+  padding: 20px; /* Adds padding inside the container */
+  background-color: #F1F1F1; /* Sets a white background for the main content area */
+  min-height: calc(100vh - 60px); /* Adjusts height to fit with header */
+  border-radius: 8px; /* Rounds the corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds subtle shadow for separation */
 }
+
 
 .status-indicators {
   display: flex;
@@ -246,29 +222,24 @@ html {
   display: flex;
   align-items: column;
   text-align: center;
-  
-  padding: 5px;
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-top: 10px;
+  padding: 5px 15px 10px;
   border-radius: 5px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for pop-out effect */
 }
 
 .indicator .count {
-  
   font-size: 1.5em;
   font-weight: bold;
 }
 
 .indicator .icon {
-  
   margin-right: 8px;
   width: 50px;
   height: 50px;
 }
 
 .ongoing {
-  background-color: #f0ad4e; /* Bootstrap warning color */
+  background-color: #26C6DA; /* Bootstrap warning color */
 }
 
 .completed {
@@ -276,81 +247,84 @@ html {
 }
 
 .pending {
-  background-color: #d9534f; /* Bootstrap danger color */
+  background-color: #AB47BC; /* Bootstrap danger color */
 }
 
-.fa-regular.fa-clock {
+.indicator:hover {
+  transform: translateY(-5px); /* Slight pop-up effect */
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2); /* Adds a shadow for more depth */
+}
+
+.fa-regular.fa-clock, .fa-regular.fa-circle-check, .fas.fa-tasks {
   font-size: 50px;
   padding-top: 3px;
   padding-right: 10px;
 }
-
-.fa-regular.fa-circle-check{
-  font-size: 50px;
-  padding-top: 3px;
-  padding-right: 10px;
-}
-
-.fas.fa-tasks{
-  font-size: 50px;
-  padding-top: 3px;
-  padding-right: 10px;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  font-size: 16px; /* Adjusted font size for better readability */
 }
 
 th,
 td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 12px 15px; /* Increased padding for a more spacious layout */
   text-align: left;
 }
 
+/* Header styling */
 th {
-  background-color: #282928;
+  background-color: #222831;
   color: white;
-}
-
-.billtable {
-}
-.billtable th {
-  background: none !important;
-  color: black;
-}
-.billtable thead th {
-  border-bottom: 1px solid #000; /* Add a solid black border at the bottom */
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .technician-list th {
-  background-color: #282928;
+  background-color: #222831;
 }
 
-tr:nth-child(even) {
-  background-color: #f9f9f9; /* Zebra striping for table */
+/* Row hover effect */
+tr:hover td {
+  background-color: #d3d3d3; /* Light gray background on hover */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
 }
 
-.standard  {
+/* Status label styling */
+.standard {
   color: #ffffff;
   background-color: rgb(66, 66, 255);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-align: center;
 }
 
 .urgent {
-  color: #ffffff; /* Bootstrap danger color */
-  background-color: #d9534f;
+  color: #ffffff;
+  background-color: #FF9800;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-align: center;
 }
 
 .emergency {
-  color: #ffffff; /* Bootstrap warning color */
-  background-color: #f0ad4e;
+  color: #ffffff;
+  background-color: #D32F2F;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-align: center;
 }
+
+
 
 button {
   padding: 5px 10px;
-  background-color: #505050; /* Bootstrap success color */
+  background-color:#222831 ; /* Bootstrap success color */
   color: white;
   border: none;
   border-radius: 5px;
@@ -366,6 +340,20 @@ button:hover {
   font-weight: bold; /* Make text bold */
 }
 
+
+.billtable {
+}
+.billtable th {
+  background: none !important;
+  color: black;
+}
+.billtable thead th {
+  border-bottom: 1px solid #000; /* Add a solid black border at the bottom */
+}
+tr:nth-child(even) {
+  background-color: #f9f9f9; /* Zebra striping for table */
+}
+
 /* CUSTOMER PENDING REQUEST */
 
 .problemPict {
@@ -376,7 +364,7 @@ button:hover {
 
 .accordion {
   --bs-accordion-btn-bg: #b7b7b7 !important;
-  --bs-accordion-active-bg: #8b8a8a !important;
+  --bs-accordion-active-bg: #222831 !important;
   --bs-accordion-active-color: #ffffff !important;
 }
 
@@ -435,7 +423,10 @@ button:hover {
   padding-top: 25px;
   padding-bottom: 50px;
   background-color: #ffffff;
+  margin-top: 50px;
+  
 }
+
 
 /* TECHNICIAN SCHEDULE */
 
@@ -477,7 +468,7 @@ button:hover {
 }
 
 .filterButton{
-  background-color: #505050;
+  background-color: #222831;
   color: #E9E9E9;
   border-radius: 5px;
 }
@@ -503,16 +494,16 @@ button:hover {
   margin-left: 5%;
   width: 15%;
   color: #f0f0f0;
-  background-color: #333;
+  background-color: #222831;
   border-radius: 5px;
 }
 .btn.btn-primary {
   margin-left: 30%;
-  background-color: #505050;
+  background-color: #222831;
 }
 
 .btn.btn-primary:hover{
-  background-color: #707070;
+  background-color: #222831;
 }
 
 .alignh2 {
@@ -527,19 +518,19 @@ button:hover {
 .vedbtns {
   font-size: 20px;
   border-radius: 5px;
-  background-color: #333;
+  background-color: #222831;
   width: 60%;
 }
 .cusaddbtn {
   font-size: 20px;
-  background-color: #333;
+  background-color: #222831;
   border-radius: 5px;
   width: 20%;
 }
 /*TECHNICIAN PROFILE********************************************************/
 .employeerequestbtn {
   margin-left: 50px;
-  background-color: #333 !important;
+  background-color: #222831 !important;
   width: 100% !important; /* Set button width to 100% */
   border-radius: 5px;
 }
@@ -571,7 +562,7 @@ button:hover {
 .emcfrmbtn {
   font-size: 20px;
 
-  background-color: #333;
+  background-color: #222831;
   border-radius: 5px;
 }
 
@@ -667,7 +658,7 @@ button:hover {
 
 /* Banner */
 .add-banner-btn {
-  background-color: #505050;
+  background-color: #222831;
   color: #E9E9E9;
   border-radius: 5px;
   padding: 10px;
@@ -675,7 +666,7 @@ button:hover {
 }
 
 .table-striped th{
-  background-color: #646464 !important;
+  background-color: #222831!important;
   color: white !important;
 }
 
@@ -738,11 +729,6 @@ button:hover {
 
 
 
-/* Container and general page styling */
-.dashboard-container {
-  padding: 10px; /* Reduced padding to save space */
-  margin-left: 250px;
-}
 
 
 
@@ -825,3 +811,9 @@ button:hover {
   object-fit: cover; /* Ensure the logo fits nicely in the round shape */
   border: 5px solid white; /* Add white border around the logo */
 }
+
+
+
+
+
+

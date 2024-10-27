@@ -4,21 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
-<link rel="stylesheet" href="style.css">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
 </head>
 <body>
   
-<div class="header">
-  <div class="header-content">
-    <span>Last login: <span class="datetime" id="last-datetime"></span></span>
-    <ul>
-    <!-- Place your bell and profile icons here -->
-    <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
-    
+  <div class="header">
+    <div class="header-content">
+      <div class="login-info">
+        <span>Last login: <span class="datetime" id="last-datetime"></span></span>
+      </div>
+      <div class="icon-container">
+        <a href="notification.html"><img src="images/notification.svg" alt="Notifications" class="icon"></a>
+   
+      </div>
+    </div>
   </div>
-</div>
+  
 
 
 <div class="sidebar">
@@ -52,7 +57,8 @@
 
 <div class="dashboard-container">
   <div class="container">
-    <h1>Dashboard</h1>
+    <h1 style="font-size: 36px; font-weight: bold; color: #222831; margin: 20px 0;">Dashboard</h1>
+
     <!-- Status indicators -->
     <div class="status-indicators">
       <div class="indicator ongoing">
@@ -130,13 +136,23 @@
 <script>
   const links = document.querySelectorAll('.sidebar ul li a');
 
-  links.forEach(link => {
-    link.addEventListener('click', function() {
-      // Remove active class from all links
-      links.forEach(link => link.classList.remove('active'));
-      
-      // Add active class to the clicked link
-      this.classList.add('active');
+  // Function to set the active class on the current link
+  function setActiveLink(link) {
+    links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+    link.classList.add('active'); // Add active class to the clicked link
+    localStorage.setItem('activeLink', link.href); // Store the current link in localStorage
+  }
+
+  // Apply the active class to the stored link on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const activeLink = localStorage.getItem('activeLink');
+    links.forEach(link => {
+      if (link.href === activeLink) {
+        link.classList.add('active'); // Restore active class for the stored link
+      }
+      link.addEventListener('click', function () {
+        setActiveLink(this); // Set the active link on click
+      });
     });
   });
 </script>
