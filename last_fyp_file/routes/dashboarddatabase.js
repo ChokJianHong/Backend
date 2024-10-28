@@ -40,7 +40,7 @@ const {
   invoiceOrder,
   markOrderCompleted,
   createReview,
-
+  cancelOrder,
   viewOrderStatusStatistics,//new
   viewProblemStatistics,//new
   viewCompletedOrderSales,//new
@@ -93,6 +93,7 @@ router.get("/customer/:token", getCustomerByToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
 // order routes
+router.post("/orders/cancel/:id", decodeToken,cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
 router.get( "/orders/details/:id",decodeToken,viewOrdersDetail);
 router.get("/orders", decodeToken, viewAllOrders);
