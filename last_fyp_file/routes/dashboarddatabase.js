@@ -40,7 +40,7 @@ const {
   invoiceOrder,
   markOrderCompleted,
   createReview,
-
+  cancelOrder,
   viewOrderStatusStatistics,//new
   viewProblemStatistics,//new
   viewCompletedOrderSales,//new
