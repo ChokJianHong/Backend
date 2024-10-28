@@ -924,22 +924,28 @@ function getPendingOrders(req, res) {
 
 function cancelOrder(req, res) {
   const { type } = req.user;
-  const { cancel_details } = req.body;
+
   if (type !== "customer") {
     return res.status(401).json({ message: "Unauthorized", status: 401 });
   }
 
   const { id } = req.params;
-  const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+
+  const declineOrderQuery = `
+    UPDATE ordertable 
+    SET technician_id = NULL, order_status = 'cancelled'
+    WHERE order_id = '${id}'`;
+
   db.query(declineOrderQuery, (error, rows) => {
     if (error) {
       throw error;
     }
     return res
       .status(200)
-      .json({ message: "Order declined successfully", status: 200 });
+      .json({ message: "Order cancelled successfully", status: 200 });
   });
 }
+
 
 
 module.exports = {
