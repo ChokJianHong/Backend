@@ -2,7 +2,7 @@ const db = require("../utils/database");
 const bcrypt = require('bcryptjs');
 
 function customerRegister(req, res) {
-  const { email, password, name, phone_number, location, auto_gate_brand, alarm_brand, auto_gate_warranty,alarm_waranty } = req.body;
+  const { email, password, name, phone_number, location, auto_gate_brand, alarm_brand, auto_gate_warranty, alarm_warranty } = req.body;
 
   // Check if email already exists
   const isUserExistQuery = `SELECT * FROM customer WHERE email='${email}'`;
@@ -22,8 +22,8 @@ function customerRegister(req, res) {
       const hashedPassword = await bcrypt.hash(password, 10); // Salt rounds = 10
 
       // Insert the new user into the database with the hashed password using string interpolation
-      const createUserQuery = `INSERT INTO customer (email, password, name, phone_number, location,auto_gate_brand,alarm_brand,auto_gate_warranty,alarm_waranty) 
-                               VALUES ('${email}', '${hashedPassword}', '${name}', '${phone_number}', '${location}', '${auto_gate_brand}', '${alarm_brand}', '${auto_gate_warranty}', '${alarm_brand}')`;
+      const createUserQuery = `INSERT INTO customer (email, password, name, phone_number, location, auto_gate_brand, alarm_brand, auto_gate_warranty, alarm_warranty) 
+                               VALUES ('${email}', '${hashedPassword}', '${name}', '${phone_number}', '${location}', '${auto_gate_brand}', '${alarm_brand}', '${auto_gate_warranty}', '${alarm_warranty}')`;
 
       db.query(createUserQuery, (error, rows) => {
         if (error) {
@@ -39,6 +39,7 @@ function customerRegister(req, res) {
     }
   });
 }
+
 
 function getAllCustomers(req, res) {
   const { type } = req.user;
