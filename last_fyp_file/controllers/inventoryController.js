@@ -135,6 +135,8 @@ const deleteInventoryItem = async (req, res) => {
     }
 };
 
+
+
 module.exports = {
     createInventoryItem,
     getAllInventoryItems,
