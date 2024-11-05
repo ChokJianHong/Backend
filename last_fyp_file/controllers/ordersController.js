@@ -1,5 +1,5 @@
 const db = require("../utils/database");
-
+const admin = require("firebase-admin");
 function createOrder(req, res) {
   const { userId, type } = req.user;
   if (type !== "customer") {
@@ -279,6 +279,43 @@ function assignTechnician(req, res) {
       .status(200)
       .json({ message: "Order assigned successfully", status: 200 });
   });
+  const sendNotification = async (registrationToken) =>{
+    const messageSend = {
+      token: registrationToken,
+      notification: {
+        title: "Request Accepted!",
+        body: "Technician: Dylan has been assigned to your task"
+      },
+      data: {
+        key1: "value1",
+        key2: "value2"
+      },
+      android: {
+        priority: "high"
+      },
+      apns: {
+        payload: {
+          aps: {
+            badge: 42
+          }
+        }
+      }
+    };
+  
+    admin
+      .messaging()
+      .send(messageSend)
+      .then(response => {
+        console.log("Successfuly sent message:", response);
+      })
+      .catch(error => {
+        console.error("Error sending message:", error);
+      });
+  };
+  const registrationToken = "fgNKh7EOQLu0clw3fCp34q:APA91bFpxwmdC2SoA6d6PZZcpSyYv_6KOX8mXaxoA8gkrK9d5nVvyf6XzbmHPqyi3vhwOjS7KWtpZWqR0VLZz1zD8B5VssMrABoiXgxDIVMoYnK9-jbd9OA";
+
+
+  sendNotification(registrationToken);
 }
 function acceptOrder(req, res) {
   const { type, userId } = req.user;

@@ -7,6 +7,8 @@ const db = require('./utils/database');
 const url = require('url');
 const morgan = require("morgan");
 const cors = require('cors');
+const admin = require("firebase-admin");
+const serviceAccount = require("./fypcms-a3544-firebase-adminsdk-a2fne-616c19a2f5.json");
 
 const app = express();
 const port = 5005;
@@ -15,6 +17,11 @@ app.use(cors());
 
 app.use(bodyParser.json());
 app.use(express.static("uploads"));
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
+  
 
 // Corrected require paths and variable names
 const dashboardRoute = require("./routes/dashboarddatabase");
