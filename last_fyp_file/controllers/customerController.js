@@ -2,7 +2,7 @@ const db = require("../utils/database");
 const bcrypt = require('bcryptjs');
 
 function customerRegister(req, res) {
-  const { email, password, name, phone_number, location } = req.body;
+  const { email, password, name, phone_number, location, auto_gate_brand, alarm_brand, auto_gate_warranty, alarm_warranty } = req.body;
 
   // Check if email already exists
   const isUserExistQuery = `SELECT * FROM customer WHERE email='${email}'`;
@@ -22,8 +22,8 @@ function customerRegister(req, res) {
       const hashedPassword = await bcrypt.hash(password, 10); // Salt rounds = 10
 
       // Insert the new user into the database with the hashed password using string interpolation
-      const createUserQuery = `INSERT INTO customer (email, password, name, phone_number, location) 
-                               VALUES ('${email}', '${hashedPassword}', '${name}', '${phone_number}', '${location}')`;
+      const createUserQuery = `INSERT INTO customer (email, password, name, phone_number, location, auto_gate_brand, alarm_brand, auto_gate_warranty, alarm_warranty) 
+                               VALUES ('${email}', '${hashedPassword}', '${name}', '${phone_number}', '${location}', '${auto_gate_brand}', '${alarm_brand}', '${auto_gate_warranty}', '${alarm_warranty}')`;
 
       db.query(createUserQuery, (error, rows) => {
         if (error) {
@@ -39,6 +39,7 @@ function customerRegister(req, res) {
     }
   });
 }
+
 
 function getAllCustomers(req, res) {
   const { type } = req.user;
@@ -137,6 +138,8 @@ function updateCustomer(req, res) {
     location,
     alarm_brand,
     autogate_brand,
+    auto_gate_warranty,
+    alarm_waranty,
   } = req.body;
 
   const { type } = req.user;
@@ -154,7 +157,12 @@ function updateCustomer(req, res) {
   updateCustomerQuery = autogate_brand
     ? `${updateCustomerQuery}, auto_gate_brand = '${autogate_brand}'`
     : updateCustomerQuery;
-
+    updateCustomerQuery = auto_gate_warranty
+    ? `${updateCustomerQuery}, auto_gate_warranty = '${auto_gate_warranty}'`
+    : updateCustomerQuery;
+    updateCustomerQuery = alarm_waranty
+    ? `${updateCustomerQuery}, alarm_waranty = '${alarm_waranty}'`
+    : updateCustomerQuery;
   updateCustomerQuery = `${updateCustomerQuery} WHERE customer_id = ${customerId}`;
   db.query(updateCustomerQuery, (error, result) => {
     if (error) {
