@@ -312,7 +312,7 @@ function assignTechnician(req, res) {
         console.error("Error sending message:", error);
       });
   };
-  const registrationToken = "fgNKh7EOQLu0clw3fCp34q:APA91bFpxwmdC2SoA6d6PZZcpSyYv_6KOX8mXaxoA8gkrK9d5nVvyf6XzbmHPqyi3vhwOjS7KWtpZWqR0VLZz1zD8B5VssMrABoiXgxDIVMoYnK9-jbd9OA";
+  const registrationToken = "crjrc9pBR1y-XIy1pdz0uh:APA91bETKJYrM2b1PFNmXr4nUq5zpFOeYkUMXYukdYV501wj4cY4YYZ7xyZqRQ7iOjVB9uHdKiHQvP6CtKjrZOdXTyfP87ALGqVnRAMUtNThVYVJoGyWwlk";
 
 
   sendNotification(registrationToken);

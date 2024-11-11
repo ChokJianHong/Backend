@@ -222,6 +222,28 @@ function getCustomerByToken(req, res) {
   });
 }
 
+const updateFCMToken = async (req, res) => {
+  const customerId = req.params.id;
+  // Update the database with the generated token
+  const updateUserTokenQuery = `
+  UPDATE customer SET token="${fcmToken}" WHERE customer_id ="${customerId}"
+`;
+
+db.query(updateUserTokenQuery, (error) => {
+  if (error) {
+    return res.status(500).json({ status: 500, message: "Internal Server Error" });
+  }
+
+  // Respond with success message along with token
+  return res.status(200).json({
+    message: "Login successful",
+    result: rows[0],
+    token,
+    status: 200,
+  });
+});
+}
+
 module.exports = {
   customerRegister,
   getAllCustomers,
@@ -229,5 +251,6 @@ module.exports = {
   updateCustomer,
   deleteCustomer,
   getCustomer,
-  getCustomerByToken
+  getCustomerByToken,
+  updateFCMToken
 };
