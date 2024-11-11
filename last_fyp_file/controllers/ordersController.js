@@ -252,7 +252,7 @@ function declineOrder(req, res) {
   }
 
   const { id } = req.params;
-  const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
   db.query(declineOrderQuery, (error) => {
     if (error) {
       throw error;
