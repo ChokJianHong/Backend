@@ -171,6 +171,41 @@ function getTechnicianByToken(req, res) {
   });
 }
 
+function sendLocation(req, res) {
+  const { longitude, latitude } = req.body;
+  const technicianId = req.params.id;  // Access technicianId from the URL parameter
+
+  if (!longitude || !latitude) {
+    return res.status(400).json({ error: 'longitude and latitude are required.' });
+  }
+
+  // Validate inputs to prevent SQL injection
+  if (isNaN(longitude) || isNaN(latitude) || isNaN(technicianId)) {
+    return res.status(400).json({ error: 'Invalid input. Longitude, latitude, and technicianId must be valid numbers.' });
+  }
+
+  // Using string interpolation (be careful with SQL injection)
+  const getLocationQuery = `
+    UPDATE technician 
+    SET latitude = ${latitude}, longitude = ${longitude} 
+    WHERE technician_id = ${technicianId}
+  `;
+
+  // Perform the database query
+  db.query(getLocationQuery, (error, result) => {
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ error: 'An error occurred while saving the location.' });
+    }
+
+    // Respond with success
+    return res.status(200).json({ message: 'Location saved successfully', data: result });
+  });
+}
+
+
+
+
 
 module.exports = {
   createTechnician,
@@ -178,5 +213,6 @@ module.exports = {
   getTechnicianById,
   updateTechnician,
   deleteTechnician,
-  getTechnicianByToken
+  getTechnicianByToken,
+  sendLocation
 };

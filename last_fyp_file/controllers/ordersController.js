@@ -252,7 +252,7 @@ function declineOrder(req, res) {
   }
 
   const { id } = req.params;
-  const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
   db.query(declineOrderQuery, (error) => {
     if (error) {
       throw error;
@@ -279,7 +279,7 @@ function assignTechnician(req, res) {
       .status(200)
       .json({ message: "Order assigned successfully", status: 200 });
   });
-  const sendNotification = async (registrationToken) =>{
+  const sendNotification = async (registrationToken) => {
     const messageSend = {
       token: registrationToken,
       notification: {
@@ -301,7 +301,7 @@ function assignTechnician(req, res) {
         }
       }
     };
-  
+
     admin
       .messaging()
       .send(messageSend)
@@ -915,7 +915,7 @@ function viewOrdersDetail(req, res) {
       ProblemType: results[0].problem_type,
       CustomerID: results[0].customer_id,
       TechnicianID: results[0].technician_id,
-      TechnicianETA:results[0].technician_eta,
+      TechnicianETA: results[0].technician_eta,
       customer: {
         name: results[0].customer_name,
         address: results[0].customer_address,
