@@ -11,6 +11,9 @@ const {
   getInventoryItemByName
 } = require("../controllers/inventoryController");
 
+const {
+  sendMessage
+} = require("../controllers/chatController");
 
 const {
   customerRegister,
@@ -149,6 +152,9 @@ router.get("/admin/banner", decodeToken, getAllBanners);
 router.get("/admin/banner/:id", decodeToken, getBannerById);
 router.put("/admin/banner/:id", decodeToken, upload.single("image"), updateBanner);
 
+
+// chat
+router.post('/chat/sendMessage', sendMessage);
 
 // request form // new_addition
 router.post("/request", createRequestForm);
