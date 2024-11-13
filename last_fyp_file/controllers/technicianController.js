@@ -207,6 +207,7 @@ function sendLocation(req, res) {
 
 
 
+
 module.exports = {
   createTechnician,
   getAllTechnicians,
