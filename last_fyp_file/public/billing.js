@@ -64,8 +64,21 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error fetching data:", error);
       });
   };
+  window.downloadPDF = function () {
+    const billingContent = document.getElementById("billing-content");
+    const options = {
+      margin: 1,
+      filename: `Invoice_${orderId}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    };
+    html2pdf().set(options).from(billingContent).save();
+  };
+
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get("id");
   fetchData(orderId);
 });
+

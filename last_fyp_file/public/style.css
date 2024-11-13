@@ -260,6 +260,7 @@ html {
   padding-top: 3px;
   padding-right: 10px;
 }
+/* General table styling */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -267,6 +268,7 @@ table {
   font-size: 16px; /* Adjusted font size for better readability */
 }
 
+/* Cell styling */
 th,
 td {
   border: 1px solid #ddd;
@@ -282,15 +284,48 @@ th {
   text-transform: uppercase;
 }
 
+/* Technician list header (if applicable) */
 .technician-list th {
   background-color: #222831;
 }
 
-/* Row hover effect */
-tr:hover td {
-  background-color: #d3d3d3; /* Light gray background on hover */
-  transition: background-color 0.3s ease; /* Smooth transition effect */
+/* Set fixed widths for each column */
+th:nth-child(1), td:nth-child(1) { /* Service No. */
+    width: 10%; /* Adjust percentage as needed */
 }
+
+th:nth-child(2), td:nth-child(2) { /* Problem Type */
+    width: 30%;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Priority */
+    width: 20%;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Action */
+    width: 10%;
+}
+
+/* Additional styling for specific columns if needed */
+.priority-cell {
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #ff5722; /* Example background for "Urgent" priority */
+}
+
+.action-cell button {
+    padding: 5px 10px;
+    color: #fff;
+    background-color: #333;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.action-cell button:hover {
+    background-color: #555;
+}
+
 
 /* Status label styling */
 .standard {

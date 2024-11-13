@@ -50,6 +50,7 @@ const {
   deleteOrder,// new_addition_inventory Management
   viewOrdersDetail,
   getPendingOrders,
+  viewReview,
 } = require("../controllers/ordersController");
 const { decodeToken } = require("../utils/authGuard");
 const {
@@ -121,6 +122,11 @@ router.put(
   upload.single("image"),
   markOrderCompleted
 );
+
+
+router.get("/orders/review",decodeToken, viewReview);//new
+
+
 
 router.get("/orders/:id/request-detail", decodeToken, viewRequestDetail);
 router.get("/orders/pending/count", decodeToken, pendingOrdersCount);

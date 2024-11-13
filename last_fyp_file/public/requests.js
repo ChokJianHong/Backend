@@ -118,13 +118,17 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error fetching pending requests:", error);
       });
   }
+  
 
+  // Fetch Ongoing Requests
   function fetchOngoingRequests() {
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found in local storage");
       window.location.href = "login.html";
+      return;
     }
+
     fetch(`${baseURL}/orders?status=ongoing`, {
       method: "GET",
       headers: {
@@ -135,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => {
         if (response.status === 401) {
           window.location.href = "login.html";
+          return;
         }
         return response.json();
       })
@@ -155,10 +160,21 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="card-text">Technician: <span class="technician-name">${request.technician_name}</span></p>
             <p class="card-text">Location: <span class="technician-location">${request.customer_address}</span></p>
             <a href="view_requests.html?id=${request.order_id}" class="btn btn-primary view-details-btn ml-auto">View Details</a>
+            <button class="btn btn-danger decline-btn ml-2" data-order-id="${request.order_id}">Decline</button>
           `;
 
           card.appendChild(cardBody);
           ongoingRequestContainer.appendChild(card);
+        });
+
+        // Attach click event to decline buttons
+        document.querySelectorAll(".decline-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            declineOrderId = this.getAttribute("data-order-id");
+            document.getElementById("declineReason").value = ""; // Reset reason input
+            document.getElementById("declineError").innerHTML = ""; // Clear error message
+            $("#declineModal").modal("show"); // Show the modal
+          });
         });
       })
       .catch((error) => {
@@ -166,15 +182,15 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  fetchOngoingRequests();
-  fetchPendingRequests();
-
+  // Decline request
   function declineRequest(id, cancel_details) {
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found in local storage");
       window.location.href = "login.html";
+      return;
     }
+
     fetch(`${baseURL}/orders/${id}/decline-request`, {
       method: "PUT",
       body: JSON.stringify({ cancel_details }),
@@ -186,6 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => {
         if (response.status === 401) {
           window.location.href = "login.html";
+          return;
         }
         return response.json();
       })
@@ -195,32 +212,34 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
           console.error("Decline request failed:", data.message);
         }
-      });
+      })
+      .catch((error) => console.error("Error declining request:", error));
   }
 
-  const confirmDecline = document.getElementById("confirmDecline");
-
-  confirmDecline.addEventListener("click", function () {
+  // Confirm Decline Button in Modal
+  document.getElementById("confirmDecline").addEventListener("click", function () {
     const declineReason = document.getElementById("declineReason").value;
     if (declineReason.trim() === "") {
-      document.getElementById("declineError").innerHTML =
-        "Please enter a reason for declining the order.";
+      document.getElementById("declineError").innerHTML = "Please enter a reason for declining the order.";
       return;
     }
-    const id = document.getElementById("declineOrderId").innerHTML.slice(4);
-    document.getElementById("declineError").innerHTML = "";
-    declineRequest(id, declineReason);
+    document.getElementById("declineError").innerHTML = ""; // Clear error message
+    $("#declineModal").modal("hide"); // Hide the modal
+    declineRequest(declineOrderId, declineReason);
   });
 
-  document
-    .getElementById("declineReason")
-    .addEventListener("input", function () {
-      document.getElementById("declineError").innerHTML = "";
-    });
+  // Clear error message when typing in the decline reason
+  document.getElementById("declineReason").addEventListener("input", function () {
+    document.getElementById("declineError").innerHTML = "";
+  });
 
-  const logout = document.getElementById("logout");
-  logout.addEventListener("click", () => {
+  // Log out
+  document.getElementById("logout").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
+
+  // Fetch ongoing requests on page load
+  fetchOngoingRequests();
+  fetchPendingRequests();
 });
