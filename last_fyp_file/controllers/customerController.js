@@ -40,6 +40,28 @@ function customerRegister(req, res) {
   });
 }
 
+function getCustomerLocation(req, res) {
+  const customerId = req.params.id;
+
+  // Use parameterized query to prevent SQL injection
+  const getLocationQuery = `SELECT location FROM customer WHERE customer_id = '${customerId}'`;
+
+  db.query(getLocationQuery, (error, customer) => {
+    if (error) {
+      console.error('Error executing query:', error);
+      return res.status(500).json({ message: 'Internal server error', status: 500 });
+    }
+
+    if (customer.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'Customer not found', status: 404 });
+    }
+
+    return res.status(200).json({ status: 200, data: customer[0] });
+  });
+}
+
 
 function getAllCustomers(req, res) {
   const { type } = req.user;
@@ -157,11 +179,11 @@ function updateCustomer(req, res) {
   updateCustomerQuery = autogate_brand
     ? `${updateCustomerQuery}, auto_gate_brand = '${autogate_brand}'`
     : updateCustomerQuery;
-    updateCustomerQuery = auto_gate_warranty
+  updateCustomerQuery = auto_gate_warranty
     ? `${updateCustomerQuery}, auto_gate_warranty = '${auto_gate_warranty}'`
     : updateCustomerQuery;
-    updateCustomerQuery = alarm_waranty
-    ? `${updateCustomerQuery}, alarm_warranty = '${alarm_waranty}'`
+  updateCustomerQuery = alarm_waranty
+    ? `${updateCustomerQuery}, alarm_waranty = '${alarm_waranty}'`
     : updateCustomerQuery;
   updateCustomerQuery = `${updateCustomerQuery} WHERE customer_id = ${customerId}`;
   db.query(updateCustomerQuery, (error, result) => {

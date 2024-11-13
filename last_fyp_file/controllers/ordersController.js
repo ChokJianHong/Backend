@@ -396,7 +396,7 @@ function markOrderCompleted(req, res) {
       res.status(500).json({ error: "Internal Server Error" });
       return;
     }
-    return res.status(200).json({ status: 200 });
+    return res.status(200).json({ success });
   });
 }
 

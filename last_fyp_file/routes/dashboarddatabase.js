@@ -23,6 +23,7 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
+  getCustomerLocation,
   updateFCMToken
 } = require("../controllers/customerController");
 
