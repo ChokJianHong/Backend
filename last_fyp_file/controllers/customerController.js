@@ -161,7 +161,7 @@ function updateCustomer(req, res) {
     ? `${updateCustomerQuery}, auto_gate_warranty = '${auto_gate_warranty}'`
     : updateCustomerQuery;
     updateCustomerQuery = alarm_waranty
-    ? `${updateCustomerQuery}, alarm_waranty = '${alarm_waranty}'`
+    ? `${updateCustomerQuery}, alarm_warranty = '${alarm_waranty}'`
     : updateCustomerQuery;
   updateCustomerQuery = `${updateCustomerQuery} WHERE customer_id = ${customerId}`;
   db.query(updateCustomerQuery, (error, result) => {
