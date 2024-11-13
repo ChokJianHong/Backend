@@ -3,18 +3,18 @@ const db = require("../utils/database");
 // Create Request Form Controller
 async function createRequestForm(req, res) {
   console.log("Creating form", req.body);
-  const { technician_name, customer_name, equipment, brand, parts_needed, } = req.body;
+  const { technician_name, customer_name, equipment, brand, parts_needed, order_id } = req.body;
 
   // Validate required fields
-  if (!technician_name || !customer_name || !equipment || !brand || !parts_needed  ) {
-    return res.status(400).json({ message: "All fields are required" });
+  if (!technician_name || !customer_name || !equipment || !brand || !parts_needed || !order_id) {
+    return res.status(400).json({ message: "All fields including order_id are required" });
   }
 
   try {
     // Use string interpolation to build the query
     const createRequestFormQuery = `
-            INSERT INTO request_forms (technician_name, customer_name, equipment, brand, parts_needed, status) 
-            VALUES ('${technician_name}', '${customer_name}', '${equipment}', '${brand}', '${parts_needed}', 'pending')
+            INSERT INTO request_forms (technician_name, customer_name, equipment, brand, parts_needed, status, order_id) 
+            VALUES ('${technician_name}', '${customer_name}', '${equipment}', '${brand}', '${parts_needed}', 'pending', ${order_id})
         `;
 
     // Execute the query
@@ -25,11 +25,12 @@ async function createRequestForm(req, res) {
       });
     });
 
-    res.status(201).json({ message: 'Request Form submitted !', id: result.insertId });
+    res.status(201).json({ message: 'Request Form submitted!', id: result.insertId });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to Submit Request Forms' });
+    res.status(500).json({ error: 'Failed to Submit Request Form' });
   }
 }
+
 
 // Update Request Form Status Controller
 function updateRequestFormStatus(req, res) {
