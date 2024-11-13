@@ -1,5 +1,6 @@
 const db = require("../utils/database");
 const bcrypt = require('bcryptjs');
+const { updateFCMToken } = require("./customerController");
 
 function createTechnician(req, res) {
   const { type } = req.user;
@@ -203,7 +204,28 @@ function sendLocation(req, res) {
   });
 }
 
+function updateFCMTokenTechnician(req, res){
+  
+  const { technicianId, fcmToken } =
+    req.body;
+  // Update the database with the generated token
+  const updateUserTokenQuery = `
+    UPDATE technician SET fcm_token="${fcmToken}" WHERE technician_id ="${technicianId}"
+  `;
 
+  db.query(updateUserTokenQuery, (error) => {
+    if (error) {
+      return res.status(500).json({ status: 500, message: "Internal Server Error" });
+    }
+
+    // Respond with success message along with token
+    return res.status(200).json({
+      message: "Login successful",
+
+      status: 200,
+    });
+  });
+}
 
 
 
@@ -215,5 +237,6 @@ module.exports = {
   updateTechnician,
   deleteTechnician,
   getTechnicianByToken,
-  sendLocation
+  sendLocation,
+  updateFCMTokenTechnician,
 };

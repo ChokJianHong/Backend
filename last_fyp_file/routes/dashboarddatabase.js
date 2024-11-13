@@ -74,7 +74,8 @@ const {
   updateTechnician,
   deleteTechnician,
   getTechnicianByToken,
-  sendLocation
+  sendLocation,
+  updateFCMTokenTechnician,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -101,7 +102,7 @@ router.post("/customer/:id", decodeToken, updateFCMToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
-
+router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
