@@ -212,51 +212,47 @@ function getRequestFormById(req, res) {
   });
 }
 
-// Function to track the order status
-function trackOrderStatus(orderId, technicianId) {
-  const timer = setTimeout(() => {
-    // Direct string interpolation (not safe for user input)
-    const query = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
-    
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        return;
-      }
+function trackOrderStatus(technicianId, orderId) {
+  // Log the orderId to check its structure
+  console.log('Order ID:', orderId);
 
-      if (results.length > 0 && results[0].status === 'pending') {
-        // Direct string interpolation for the update query
-        const updateQuery = `UPDATE technicians SET status = 'free', ongoing_order_id = NULL WHERE technician_id = ${technicianId}`;
-        db.query(updateQuery, (updateErr) => {
-          if (updateErr) {
-            console.error('Error updating technician status:', updateErr);
-          } else {
-            console.log(`Technician ${technicianId} status set to free for pending order ${orderId}`);
-          }
-        });
-      }
-    });
-  }, 20 * 60 * 1000); // 20 minutes timer
+  // Ensure orderId is a valid primitive (number or string), extract from object if necessary
+  const orderIdValue = (orderId && orderId.id) ? orderId.id : orderId; // Extract from object if orderId is an object, else use directly
 
-  const initialQuery = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
-  db.query(initialQuery, (err, results) => {
+  // Log the final orderId being used in the query
+  console.log('Using Order ID:', orderIdValue);
+
+  // Check if orderIdValue is a valid primitive
+  if (typeof orderIdValue !== 'string' && typeof orderIdValue !== 'number') {
+    console.error('Invalid order ID type');
+    return;
+  }
+
+  // Query to check the order status from the database
+  const query = 'SELECT status FROM request_forms WHERE order_id = ?';
+
+  // Execute the query
+  db.query(query, [orderIdValue], (err, results) => {
     if (err) {
       console.error('Error executing initial query:', err);
       return;
     }
 
+    // Check if the order exists and its status
     if (results.length > 0 && results[0].status === 'complete') {
-      clearTimeout(timer);
+      console.log('Order is complete, setting technician status to busy');
 
-      // Direct string interpolation for the update query
-      const updateQuery = `UPDATE technicians SET status = 'working', ongoing_order_id = ${orderId} WHERE technician_id = ${technicianId}`;
-      db.query(updateQuery, (updateErr) => {
+      // If the order is complete, update technician's status to 'busy'
+      const updateQuery = 'UPDATE technicians SET status = ?, ongoing_order_id = ? WHERE technician_id = ?';
+      db.query(updateQuery, ['busy', orderIdValue, technicianId], (updateErr, updateResults) => {
         if (updateErr) {
           console.error('Error updating technician status:', updateErr);
         } else {
-          console.log(`Technician ${technicianId} status set to busy for order ${orderId}`);
+          console.log(`Technician ${technicianId} status set to busy for order ${orderIdValue}`);
         }
       });
+    } else {
+      console.log('Order is not complete yet, technician status remains unchanged');
     }
   });
 }
