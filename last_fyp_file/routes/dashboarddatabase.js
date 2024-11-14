@@ -23,7 +23,6 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
-  getCustomerLocation,
   updateFCMToken
 } = require("../controllers/customerController");
 
@@ -74,7 +73,9 @@ const {
   updateTechnician,
   deleteTechnician,
   getTechnicianByToken,
-  sendLocation
+  sendLocation,
+  updateTechnicianArrivalTime,
+  changeTechnicianStatus
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -119,6 +120,7 @@ router.get("/orders/problem-stats", decodeToken, viewProblemStatistics);//new
 router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
 router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
 router.get("/orders/spare-parts", decodeToken, viewTopSpareParts);//new
+router.put("/technician/status/", decodeToken, changeTechnicianStatus);
 
 
 router.get("/orders/:id", decodeToken, getOrderById);// new_addition
@@ -134,7 +136,7 @@ router.put(
 
 router.get("/orders/:id/request-detail", decodeToken, viewRequestDetail);
 router.get("/orders/pending/count", decodeToken, pendingOrdersCount);
-
+router.put("/technician/arrive/", updateTechnicianArrivalTime);
 router.get("/orders/completed/count", decodeToken, completedOrdersCount);
 router.get("/orders/ongoing/count", decodeToken, ongoingOrdersCount);
 // admin routes
