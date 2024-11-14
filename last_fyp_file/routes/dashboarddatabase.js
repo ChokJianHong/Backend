@@ -75,7 +75,9 @@ const {
   getTechnicianByToken,
   sendLocation,
   updateTechnicianArrivalTime,
-  changeTechnicianStatus
+  changeTechnicianStatus,
+  updateFCMTokenTechnician,
+  declineOrderForTechnician,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -84,7 +86,7 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
-const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician } = require("../controllers/requestController");
+const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician,trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes
 router.post("/login", login);
@@ -102,7 +104,8 @@ router.post("/customer/:id", decodeToken, updateFCMToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
-
+router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
+router.put("/technician/:id/decline-request", decodeToken,declineOrderForTechnician);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
@@ -166,6 +169,7 @@ router.get("/request", getAllRequestForms);
 router.delete("/request/:id", deleteRequestForm);
 router.get("/request/:id", getRequestFormById);
 router.get("/request/technician/:name", getRequestFormsByTechnician);
+router.put('/request/technician/:technicianId/:orderId', trackOrderStatus);
 
 // inventory// new_addition
 

@@ -1,4 +1,5 @@
 const db = require("../utils/database");
+const admin = require("firebase-admin");
 
 // Create Request Form Controller
 async function createRequestForm(req, res) {
@@ -52,12 +53,69 @@ function updateRequestFormStatus(req, res) {
   // Execute the query
   db.query(updateRequestFormQuery, (error, results) => {
     if (error) {
-      return res.status(500).json({ message: "Database error", error });
+      console.error("Error updating status:", error);
+      return res.status(500).json({ message: "Database error", status: 500 });
     }
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ message: "Request form not found" });
-    }
-    return res.status(200).json({ message: "Request form status updated successfully" });
+
+    // Query for technician_id using the order_id
+    const technicianIdQuery = `SELECT technician_id FROM ordertable WHERE order_id=${id}`;
+    
+    db.query(technicianIdQuery, (error, technicianResult) => {
+      if (error || !technicianResult.length) {
+        console.error("Error retrieving customer ID:", error);
+        return res.status(500).json({ message: "Customer not found", status: 500 });
+      }
+
+      const technicianId = technicianResult[0].technician_id;
+
+      // Query for FCM token using customer_id
+      const tokenQuery = `SELECT fcm_token FROM technician WHERE technician_id=${technicianId}`;
+
+      db.query(tokenQuery, (error, tokenResult) => {
+        if (error || !tokenResult.length) {
+          console.error("Error retrieving FCM token:", error);
+          return res.status(500).json({ message: "Token not found", status: 500 });
+        }
+
+        const registrationToken = tokenResult[0].fcm_token;
+
+        // Send FCM notification
+        const sendNotification = async (registrationToken) => {
+          const messageSend = {
+            token: registrationToken,
+            notification: {
+              title: "Spare-Part Request Updated!",
+              body: `Spare-part is available for Order: ${id}`
+            },
+            data: {
+              key1: "value1",
+              key2: "value2"
+            },
+            android: {
+              priority: "high"
+            },
+            apns: {
+              payload: {
+                aps: {
+                  badge: 42
+                }
+              }
+            }
+          };
+
+          try {
+            const response = await admin.messaging().send(messageSend);
+            console.log("Successfully sent message:", response);
+          } catch (error) {
+            console.error("Error sending message:", error);
+          }
+        };
+
+        // Call the sendNotification function with the retrieved token and technician name
+        sendNotification(registrationToken);
+        return res.status(200).json({ message: "Request form status updated successfully" });        
+      });
+    });
   });
 }
 
@@ -154,6 +212,81 @@ function getRequestFormById(req, res) {
   });
 }
 
+// Track the order status and update technician's status
+function trackOrderStatus(req, res) {
+  // Get the technicianId and orderId from the request parameters
+  const technicianId = req.params.technicianId;
+  const orderId = req.params.orderId;
+
+  console.log('Received technicianId:', technicianId);
+  console.log('Received orderId:', orderId);
+
+  // Query to check the request form status and request_time
+  const query = `
+    SELECT status, request_time 
+    FROM request_forms 
+    WHERE order_id = ${orderId};  // Direct interpolation
+  `;
+  
+  // Execute the query
+  connection.execute(query, (err, results) => {
+    if (err) {
+      console.error('Error executing database query:', err);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+
+    // Check if the order was found
+    if (results.length > 0) {
+      const orderStatus = results[0].status;
+      const requestTime = results[0].request_time;
+      const currentTime = new Date();
+
+      // Check if the request status is pending and if 20 minutes have passed
+      const timeDifference = (currentTime - new Date(requestTime)) / (1000 * 60); // Time difference in minutes
+
+      if (orderStatus === 'pending' && timeDifference >= 20) {
+        // Change technician status to 'free' if 20 minutes have passed and status is still 'pending'
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'free' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to free');
+          return res.status(200).json({ message: 'Technician status updated to free' });
+        });
+      } else if (orderStatus === 'complete' && timeDifference <= 20) {
+        // Change technician status to 'working' if order status is complete within 20 minutes
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'working' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to working');
+          return res.status(200).json({ message: 'Technician status updated to working' });
+        });
+      } else {
+        return res.status(200).json({ message: 'No status update needed' });
+      }
+    } else {
+      console.error('Order not found');
+      return res.status(404).json({ error: 'Order not found' });
+    }
+  });
+}
+
+
 
 module.exports = {
   createRequestForm,
@@ -161,5 +294,6 @@ module.exports = {
   getAllRequestForms,
   deleteRequestForm,
   getRequestFormById,
-  getRequestFormsByTechnician
+  getRequestFormsByTechnician,
+  trackOrderStatus,
 };
