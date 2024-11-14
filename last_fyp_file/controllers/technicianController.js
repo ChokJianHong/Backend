@@ -302,28 +302,6 @@ async function updateTechnicianArrivalTime(req, res) {
   }
 }
 
-async function changeTechnicianStatus(req, res) {
-  const technicianId = req.params.id
-  const { status } = req.body;
-
-  try {
-    // Update the order's start_time in the MySQL database
-    const [result] = await db.query(
-      `UPDATE technician SET status = ${status} WHERE technician_id = ${technicianId}`,
-    );
-
-    res.status(200).json({
-      success: true,
-      message: 'Technician arrival time updated successfully',
-    });
-  } catch (error) {
-    console.error('Error updating technician arrival time:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating technician arrival time'
-    });
-  }
-}
 
 
 function updateFCMTokenTechnician(req, res) {

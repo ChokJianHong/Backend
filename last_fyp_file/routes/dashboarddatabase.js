@@ -86,7 +86,7 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
-const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician,trackOrderStatus } = require("../controllers/requestController");
+const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes
 router.post("/login", login);
@@ -105,7 +105,7 @@ router.post("/customer/:id", decodeToken, updateFCMToken);
 router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
 router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
-router.put("/technician/:id/decline-request", decodeToken,declineOrderForTechnician);
+router.put("/technician/:id/decline-request", decodeToken, declineOrderForTechnician);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
@@ -123,7 +123,8 @@ router.get("/orders/problem-stats", decodeToken, viewProblemStatistics);//new
 router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
 router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
 router.get("/orders/spare-parts", decodeToken, viewTopSpareParts);//new
-router.put("/technician/status/", decodeToken, changeTechnicianStatus);
+router.put("/technician/status/:id", decodeToken, changeTechnicianStatus);
+
 
 
 router.get("/orders/:id", decodeToken, getOrderById);// new_addition
