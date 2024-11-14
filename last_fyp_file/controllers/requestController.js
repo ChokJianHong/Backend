@@ -249,7 +249,7 @@ function trackOrderStatus(orderId, technicianId) {
       clearTimeout(timer);
 
       // Direct string interpolation for the update query
-      const updateQuery = `UPDATE technicians SET status = 'busy', ongoing_order_id = ${orderId} WHERE technician_id = ${technicianId}`;
+      const updateQuery = `UPDATE technicians SET status = 'working', ongoing_order_id = ${orderId} WHERE technician_id = ${technicianId}`;
       db.query(updateQuery, (updateErr) => {
         if (updateErr) {
           console.error('Error updating technician status:', updateErr);
