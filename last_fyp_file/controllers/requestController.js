@@ -265,7 +265,7 @@ function trackOrderStatus(req, res) {
         const updateQuery = `
           UPDATE technicians 
           SET status = 'working' 
-          WHERE technician_id = ${technicianId};  // Direct interpolation
+          WHERE technician_id = ${technicianId};  
         `;
 
         connection.execute(updateQuery, (err, results) => {
