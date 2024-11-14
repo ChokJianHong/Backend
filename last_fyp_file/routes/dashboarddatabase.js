@@ -167,7 +167,8 @@ router.get("/request", getAllRequestForms);
 router.delete("/request/:id", deleteRequestForm);
 router.get("/request/:id", getRequestFormById);
 router.get("/request/technician/:name", getRequestFormsByTechnician);
-router.put("/request/technician/:id", trackOrderStatus)
+router.put('/request/technician/:technicianId/:orderId', trackOrderStatus);
+
 // inventory// new_addition
 
 // Inventory Routes // new_addition

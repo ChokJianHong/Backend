@@ -212,50 +212,80 @@ function getRequestFormById(req, res) {
   });
 }
 
-function trackOrderStatus(technicianId, orderId) {
-  // Log the orderId to check its structure
-  console.log('Order ID:', orderId);
+// Track the order status and update technician's status
+function trackOrderStatus(req, res) {
+  // Get the technicianId and orderId from the request parameters
+  const technicianId = req.params.technicianId;
+  const orderId = req.params.orderId;
 
-  // Ensure orderId is a valid primitive (number or string), extract from object if necessary
-  const orderIdValue = (orderId && orderId.id) ? orderId.id : orderId; // Extract from object if orderId is an object, else use directly
+  console.log('Received technicianId:', technicianId);
+  console.log('Received orderId:', orderId);
 
-  // Log the final orderId being used in the query
-  console.log('Using Order ID:', orderIdValue);
-
-  // Check if orderIdValue is a valid primitive
-  if (typeof orderIdValue !== 'string' && typeof orderIdValue !== 'number') {
-    console.error('Invalid order ID type');
-    return;
-  }
-
-  // Query to check the order status from the database
-  const query = 'SELECT status FROM request_forms WHERE order_id = ?';
-
+  // Query to check the request form status and request_time
+  const query = `
+    SELECT status, request_time 
+    FROM request_forms 
+    WHERE order_id = ${orderId};  // Direct interpolation
+  `;
+  
   // Execute the query
-  db.query(query, [orderIdValue], (err, results) => {
+  connection.execute(query, (err, results) => {
     if (err) {
-      console.error('Error executing initial query:', err);
-      return;
+      console.error('Error executing database query:', err);
+      return res.status(500).json({ error: 'Database query error' });
     }
 
-    // Check if the order exists and its status
-    if (results.length > 0 && results[0].status === 'complete') {
-      console.log('Order is complete, setting technician status to busy');
+    // Check if the order was found
+    if (results.length > 0) {
+      const orderStatus = results[0].status;
+      const requestTime = results[0].request_time;
+      const currentTime = new Date();
 
-      // If the order is complete, update technician's status to 'busy'
-      const updateQuery = 'UPDATE technicians SET status = ?, ongoing_order_id = ? WHERE technician_id = ?';
-      db.query(updateQuery, ['busy', orderIdValue, technicianId], (updateErr, updateResults) => {
-        if (updateErr) {
-          console.error('Error updating technician status:', updateErr);
-        } else {
-          console.log(`Technician ${technicianId} status set to busy for order ${orderIdValue}`);
-        }
-      });
+      // Check if the request status is pending and if 20 minutes have passed
+      const timeDifference = (currentTime - new Date(requestTime)) / (1000 * 60); // Time difference in minutes
+
+      if (orderStatus === 'pending' && timeDifference >= 20) {
+        // Change technician status to 'free' if 20 minutes have passed and status is still 'pending'
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'free' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to free');
+          return res.status(200).json({ message: 'Technician status updated to free' });
+        });
+      } else if (orderStatus === 'complete' && timeDifference <= 20) {
+        // Change technician status to 'working' if order status is complete within 20 minutes
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'working' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to working');
+          return res.status(200).json({ message: 'Technician status updated to working' });
+        });
+      } else {
+        return res.status(200).json({ message: 'No status update needed' });
+      }
     } else {
-      console.log('Order is not complete yet, technician status remains unchanged');
+      console.error('Order not found');
+      return res.status(404).json({ error: 'Order not found' });
     }
   });
 }
+
 
 
 module.exports = {
