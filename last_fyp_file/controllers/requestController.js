@@ -212,6 +212,55 @@ function getRequestFormById(req, res) {
   });
 }
 
+// Function to track the order status
+function trackOrderStatus(orderId, technicianId) {
+  const timer = setTimeout(() => {
+    // Direct string interpolation (not safe for user input)
+    const query = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
+    
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        return;
+      }
+
+      if (results.length > 0 && results[0].status === 'pending') {
+        // Direct string interpolation for the update query
+        const updateQuery = `UPDATE technicians SET status = 'free', ongoing_order_id = NULL WHERE technician_id = ${technicianId}`;
+        db.query(updateQuery, (updateErr) => {
+          if (updateErr) {
+            console.error('Error updating technician status:', updateErr);
+          } else {
+            console.log(`Technician ${technicianId} status set to free for pending order ${orderId}`);
+          }
+        });
+      }
+    });
+  }, 20 * 60 * 1000); // 20 minutes timer
+
+  const initialQuery = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
+  db.query(initialQuery, (err, results) => {
+    if (err) {
+      console.error('Error executing initial query:', err);
+      return;
+    }
+
+    if (results.length > 0 && results[0].status === 'complete') {
+      clearTimeout(timer);
+
+      // Direct string interpolation for the update query
+      const updateQuery = `UPDATE technicians SET status = 'busy', ongoing_order_id = ${orderId} WHERE technician_id = ${technicianId}`;
+      db.query(updateQuery, (updateErr) => {
+        if (updateErr) {
+          console.error('Error updating technician status:', updateErr);
+        } else {
+          console.log(`Technician ${technicianId} status set to busy for order ${orderId}`);
+        }
+      });
+    }
+  });
+}
+
 
 module.exports = {
   createRequestForm,
@@ -219,5 +268,6 @@ module.exports = {
   getAllRequestForms,
   deleteRequestForm,
   getRequestFormById,
-  getRequestFormsByTechnician
+  getRequestFormsByTechnician,
+  trackOrderStatus,
 };

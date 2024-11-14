@@ -228,6 +228,25 @@ function updateFCMTokenTechnician(req, res){
 }
 
 
+function declineOrderForTechnician(req, res) {
+  const { type } = req.user;
+  const { cancel_details } = req.body;
+  if (type === "customer") {
+    return res.status(401).json({ message: "Unauthorized", status: 401 });
+  }
+
+  const { id } = req.params;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  db.query(declineOrderQuery, (error) => {
+    if (error) {
+      throw error;
+    }
+    return res
+      .status(200)
+      .json({ message: "Order declined successfully", status: 200 });
+  });
+}
+
 
 
 module.exports = {
@@ -239,4 +258,5 @@ module.exports = {
   getTechnicianByToken,
   sendLocation,
   updateFCMTokenTechnician,
+  declineOrderForTechnician
 };
