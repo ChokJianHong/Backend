@@ -3,12 +3,13 @@
 const db = require("../utils/database"); // Ensure you have a database utility
 
 const createInventoryItem = async (req, res) => {
-    const { name, features, stockAmount, image ,price} = req.body;
-    
+    const { name, features, stockAmount, image, price } = req.body;
+
     // Check if all fields are provided
     if (!name || !features || !stockAmount || !image || !price) {
         return res.status(400).json({ message: "All fields are required" });
     }
+    
 
     try {
         // Build the SQL query string with string interpolation
@@ -136,6 +137,40 @@ const deleteInventoryItem = async (req, res) => {
 };
 
 
+async function getInventoryItemByName(req, res) {
+    const query = req.query.query;
+
+    if (!query) {
+        return res.status(400).json({ error: 'Query parameter is required' });
+    }
+
+    try {
+        // Raw query using db.query
+        const sqlQuery = `SELECT name FROM inventory WHERE name LIKE '%${query}%'`;
+
+        // Execute the query
+        db.query(sqlQuery, (err, rows) => {
+            if (err) {
+                console.error('Error fetching inventory items:', err);
+                return res.status(500).json({ error: 'Failed to fetch inventory items' });
+            }
+
+            // Map the results to only return the item names
+            const items = rows.map((row) => row.name);
+
+            // Return the list of items as a JSON response
+            res.json(items);
+        });
+
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).json({ error: 'Failed to fetch inventory items' });
+    }
+}
+
+
+
+
 
 module.exports = {
     createInventoryItem,
@@ -143,4 +178,5 @@ module.exports = {
     getInventoryItemById,
     updateInventoryItem,
     deleteInventoryItem,
+    getInventoryItemByName,
 };

@@ -1,20 +1,21 @@
 const db = require("../utils/database");
+const admin = require("firebase-admin");
 
 // Create Request Form Controller
 async function createRequestForm(req, res) {
   console.log("Creating form", req.body);
-  const { technician_name, customer_name, equipment, brand, parts_needed, } = req.body;
+  const { technician_name, customer_name, equipment, brand, parts_needed, order_id } = req.body;
 
   // Validate required fields
-  if (!technician_name || !customer_name || !equipment || !brand || !parts_needed  ) {
-    return res.status(400).json({ message: "All fields are required" });
+  if (!technician_name || !customer_name || !equipment || !brand || !parts_needed || !order_id) {
+    return res.status(400).json({ message: "All fields including order_id are required" });
   }
 
   try {
     // Use string interpolation to build the query
     const createRequestFormQuery = `
-            INSERT INTO request_forms (technician_name, customer_name, equipment, brand, parts_needed, status) 
-            VALUES ('${technician_name}', '${customer_name}', '${equipment}', '${brand}', '${parts_needed}', 'pending')
+            INSERT INTO request_forms (technician_name, customer_name, equipment, brand, parts_needed, status, order_id) 
+            VALUES ('${technician_name}', '${customer_name}', '${equipment}', '${brand}', '${parts_needed}', 'pending', ${order_id})
         `;
 
     // Execute the query
@@ -25,11 +26,12 @@ async function createRequestForm(req, res) {
       });
     });
 
-    res.status(201).json({ message: 'Request Form submitted !', id: result.insertId });
+    res.status(201).json({ message: 'Request Form submitted!', id: result.insertId });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to Submit Request Forms' });
+    res.status(500).json({ error: 'Failed to Submit Request Form' });
   }
 }
+
 
 // Update Request Form Status Controller
 function updateRequestFormStatus(req, res) {
@@ -51,12 +53,69 @@ function updateRequestFormStatus(req, res) {
   // Execute the query
   db.query(updateRequestFormQuery, (error, results) => {
     if (error) {
-      return res.status(500).json({ message: "Database error", error });
+      console.error("Error updating status:", error);
+      return res.status(500).json({ message: "Database error", status: 500 });
     }
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ message: "Request form not found" });
-    }
-    return res.status(200).json({ message: "Request form status updated successfully" });
+
+    // Query for technician_id using the order_id
+    const technicianIdQuery = `SELECT technician_id FROM ordertable WHERE order_id=${id}`;
+    
+    db.query(technicianIdQuery, (error, technicianResult) => {
+      if (error || !technicianResult.length) {
+        console.error("Error retrieving customer ID:", error);
+        return res.status(500).json({ message: "Customer not found", status: 500 });
+      }
+
+      const technicianId = technicianResult[0].technician_id;
+
+      // Query for FCM token using customer_id
+      const tokenQuery = `SELECT fcm_token FROM technician WHERE technician_id=${technicianId}`;
+
+      db.query(tokenQuery, (error, tokenResult) => {
+        if (error || !tokenResult.length) {
+          console.error("Error retrieving FCM token:", error);
+          return res.status(500).json({ message: "Token not found", status: 500 });
+        }
+
+        const registrationToken = tokenResult[0].fcm_token;
+
+        // Send FCM notification
+        const sendNotification = async (registrationToken) => {
+          const messageSend = {
+            token: registrationToken,
+            notification: {
+              title: "Spare-Part Request Updated!",
+              body: `Spare-part is available for Order: ${id}`
+            },
+            data: {
+              key1: "value1",
+              key2: "value2"
+            },
+            android: {
+              priority: "high"
+            },
+            apns: {
+              payload: {
+                aps: {
+                  badge: 42
+                }
+              }
+            }
+          };
+
+          try {
+            const response = await admin.messaging().send(messageSend);
+            console.log("Successfully sent message:", response);
+          } catch (error) {
+            console.error("Error sending message:", error);
+          }
+        };
+
+        // Call the sendNotification function with the retrieved token and technician name
+        sendNotification(registrationToken);
+        return res.status(200).json({ message: "Request form status updated successfully" });        
+      });
+    });
   });
 }
 

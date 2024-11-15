@@ -1,5 +1,6 @@
 const db = require("../utils/database");
 const bcrypt = require('bcryptjs');
+const { updateFCMToken } = require("./customerController");
 
 function createTechnician(req, res) {
   const { type } = req.user;
@@ -171,6 +172,63 @@ function getTechnicianByToken(req, res) {
   });
 }
 
+function sendLocation(req, res) {
+  const { longitude, latitude } = req.body;
+  const technicianId = req.params.id;  // Access technicianId from the URL parameter
+
+  if (!longitude || !latitude) {
+    return res.status(400).json({ error: 'longitude and latitude are required.' });
+  }
+
+  // Validate inputs to prevent SQL injection
+  if (isNaN(longitude) || isNaN(latitude) || isNaN(technicianId)) {
+    return res.status(400).json({ error: 'Invalid input. Longitude, latitude, and technicianId must be valid numbers.' });
+  }
+
+  // Using string interpolation (be careful with SQL injection)
+  const getLocationQuery = `
+    UPDATE technician 
+    SET latitude = ${latitude}, longitude = ${longitude} 
+    WHERE technician_id = ${technicianId}
+  `;
+
+  // Perform the database query
+  db.query(getLocationQuery, (error, result) => {
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ error: 'An error occurred while saving the location.' });
+    }
+
+    // Respond with success
+    return res.status(200).json({ message: 'Location saved successfully', data: result });
+  });
+}
+
+function updateFCMTokenTechnician(req, res){
+  
+  const { technicianId, fcmToken } =
+    req.body;
+  // Update the database with the generated token
+  const updateUserTokenQuery = `
+    UPDATE technician SET fcm_token="${fcmToken}" WHERE technician_id ="${technicianId}"
+  `;
+
+  db.query(updateUserTokenQuery, (error) => {
+    if (error) {
+      return res.status(500).json({ status: 500, message: "Internal Server Error" });
+    }
+
+    // Respond with success message along with token
+    return res.status(200).json({
+      message: "Login successful",
+
+      status: 200,
+    });
+  });
+}
+
+
+
 
 module.exports = {
   createTechnician,
@@ -178,5 +236,7 @@ module.exports = {
   getTechnicianById,
   updateTechnician,
   deleteTechnician,
-  getTechnicianByToken
+  getTechnicianByToken,
+  sendLocation,
+  updateFCMTokenTechnician,
 };

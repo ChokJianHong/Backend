@@ -252,7 +252,7 @@ function declineOrder(req, res) {
   }
 
   const { id } = req.params;
-  const declineOrderQuery = `UPDATE ordertable SET technician_id=NULL, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
   db.query(declineOrderQuery, (error) => {
     if (error) {
       throw error;
@@ -280,6 +280,8 @@ function assignTechnician(req, res) {
       .json({ message: "Order assigned successfully", status: 200 });
   });
   const sendNotification = async (registrationToken) =>{
+  const sendNotification = async (registrationToken) => {
+
     const messageSend = {
       token: registrationToken,
       notification: {
@@ -301,7 +303,8 @@ function assignTechnician(req, res) {
         }
       }
     };
-  
+
+
     admin
       .messaging()
       .send(messageSend)
@@ -313,6 +316,7 @@ function assignTechnician(req, res) {
       });
   };
   const registrationToken = "fgNKh7EOQLu0clw3fCp34q:APA91bFpxwmdC2SoA6d6PZZcpSyYv_6KOX8mXaxoA8gkrK9d5nVvyf6XzbmHPqyi3vhwOjS7KWtpZWqR0VLZz1zD8B5VssMrABoiXgxDIVMoYnK9-jbd9OA";
+  const registrationToken = "crjrc9pBR1y-XIy1pdz0uh:APA91bETKJYrM2b1PFNmXr4nUq5zpFOeYkUMXYukdYV501wj4cY4YYZ7xyZqRQ7iOjVB9uHdKiHQvP6CtKjrZOdXTyfP87ALGqVnRAMUtNThVYVJoGyWwlk";
 
 
   sendNotification(registrationToken);
@@ -396,7 +400,7 @@ function markOrderCompleted(req, res) {
       res.status(500).json({ error: "Internal Server Error" });
       return;
     }
-    return res.status(200).json({ status: 200 });
+    return res.status(200).json({ success });
   });
 }
 
@@ -915,7 +919,7 @@ function viewOrdersDetail(req, res) {
       ProblemType: results[0].problem_type,
       CustomerID: results[0].customer_id,
       TechnicianID: results[0].technician_id,
-      TechnicianETA:results[0].technician_eta,
+      TechnicianETA: results[0].technician_eta,
       customer: {
         name: results[0].customer_name,
         address: results[0].customer_address,
@@ -1013,3 +1017,4 @@ module.exports = {
   getPendingOrders,
   cancelOrder
 };
+}

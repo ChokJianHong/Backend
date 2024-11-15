@@ -53,7 +53,7 @@ function createBanner(req, res) {
 function getAllBanners(req, res) {
     const { type } = req.user;
   
-    if (type !== "admin") {
+    if (type !== "admin" & type !== "customer") {
       return res.status(401).json({ message: "Unauthorized", status: 401 });
     }
     const getAllBannersQuery = `SELECT * FROM banner`;

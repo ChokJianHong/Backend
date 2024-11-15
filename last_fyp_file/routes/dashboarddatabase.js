@@ -7,9 +7,13 @@ const {
   getAllInventoryItems,
   getInventoryItemById,
   updateInventoryItem,
-  deleteInventoryItem
+  deleteInventoryItem,
+  getInventoryItemByName
 } = require("../controllers/inventoryController");
 
+const {
+  sendMessage
+} = require("../controllers/chatController");
 
 const {
   customerRegister,
@@ -18,7 +22,9 @@ const {
   updateCustomer,
   deleteCustomer,
   getCustomer,
-  getCustomerByToken
+  getCustomerByToken,
+  getCustomerLocation,
+  updateFCMToken
 } = require("../controllers/customerController");
 
 const router = express.Router();
@@ -69,6 +75,8 @@ const {
   updateTechnician,
   deleteTechnician,
   getTechnicianByToken,
+  sendLocation,
+  updateFCMTokenTechnician,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -91,12 +99,15 @@ router.get("/fetch-last-login", getLastLogin);
 router.post("/customer/register", customerRegister);
 router.get("/technician/customersDetail/:id", getCustomer);
 router.get("/customer/:token", getCustomerByToken);
+router.post("/customer/:id", decodeToken, updateFCMToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
+router.put("/technician/location/:id", decodeToken, sendLocation);
+router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
 // order routes
-router.post("/orders/cancel/:id", decodeToken,cancelOrder);
+router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
-router.get( "/orders/details/:id",decodeToken,viewOrdersDetail);
+router.get("/orders/details/:id", decodeToken, viewOrdersDetail);
 router.get("/orders", decodeToken, viewAllOrders);
 router.post("/orders", decodeToken, upload.single("image"), createOrder);
 router.get("/orders/history", decodeToken, viewCompletedOrderHistory);
@@ -109,7 +120,7 @@ router.get("/orders/:id/invoice", decodeToken, invoiceOrder);
 router.get("/orders/problem-stats", decodeToken, viewProblemStatistics);//new
 router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
 router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
-router.get("/orders/spare-parts",decodeToken, viewTopSpareParts);//new
+router.get("/orders/spare-parts", decodeToken, viewTopSpareParts);//new
 
 
 router.get("/orders/:id", decodeToken, getOrderById);// new_addition
@@ -150,22 +161,26 @@ router.get("/admin/banner/:id", decodeToken, getBannerById);
 router.put("/admin/banner/:id", decodeToken, upload.single("image"), updateBanner);
 
 
+// chat
+router.post('/chat/sendMessage', sendMessage);
+
 // request form // new_addition
-router.post("/request",  createRequestForm);
-router.put("/request/:id",  updateRequestFormStatus);
-router.get("/request",  getAllRequestForms);
-router.delete("/request/:id",  deleteRequestForm);
-router.get("/request/:id",  getRequestFormById);
+router.post("/request", createRequestForm);
+router.put("/request/:id", updateRequestFormStatus);
+router.get("/request", getAllRequestForms);
+router.delete("/request/:id", deleteRequestForm);
+router.get("/request/:id", getRequestFormById);
 router.get("/request/technician/:name", getRequestFormsByTechnician);
 
 // inventory// new_addition
 
 // Inventory Routes // new_addition
-router.post("/inventory",  createInventoryItem);
+router.post("/inventory", createInventoryItem);
 router.get("/inventory", getAllInventoryItems);
-router.get("/inventory/:id",  getInventoryItemById);
-router.put("/inventory/:id",  updateInventoryItem);
-router.delete("/inventory/:id",  deleteInventoryItem);
+router.get("/inventory/:id", getInventoryItemById);
+router.put("/inventory/:id", updateInventoryItem);
+router.delete("/inventory/:id", deleteInventoryItem);
+router.get("/inventoryName/", getInventoryItemByName);
 
 
 
