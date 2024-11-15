@@ -50,26 +50,14 @@
 
 <div class="dashboard-container">
   <div class="container">
-    <h1>Review</h1>
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="review-card">
-          <p><i class="fas fa-user"></i> <span class="customer-name" id="customer-name"></span></p>
-          <p><i class="fas fa-map-marker-alt"></i> <span class="customer-address" id="customer-address"></span></p>
-          <hr>
-          <div class="rating">
-            
-          </div>
-          <div class="review-text">
-            <p id="review-text"></p>
-          </div>
-          <hr>
-          <p><strong>Submitted on: </strong><span class="review-date" id="review-date"></span></p>
-        </div>
-      </div>
+    <h1> Reviews</h1>
+    <div id="review-container" class="row">
+      <!-- Reviews will be dynamically injected here by JavaScript -->
+      <div class="loading-spinner" id="loading-spinner"></div>
     </div>
   </div>
 </div>
+
 
 <script src="./view_review.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -125,6 +125,7 @@ router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
 router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
 router.get("/orders/spare-parts", decodeToken, viewTopSpareParts);//new
 router.put("/technician/status/:id", decodeToken, changeTechnicianStatus);
+router.get("/orders/review", decodeToken, viewReview);
 
 
 
