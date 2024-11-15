@@ -252,14 +252,76 @@ function declineOrder(req, res) {
   }
 
   const { id } = req.params;
-  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='cancelled', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
   db.query(declineOrderQuery, (error) => {
     if (error) {
-      throw error;
+      console.error("Error assigning technician:", error);
+      return res.status(500).json({ message: "Database error", status: 500 });
     }
-    return res
-      .status(200)
-      .json({ message: "Order declined successfully", status: 200 });
+
+    // Query for customer_id using the order_id
+    const customerIdQuery = `SELECT customer_id FROM ordertable WHERE order_id=${id}`;
+    
+    db.query(customerIdQuery, (error, customerResult) => {
+      if (error || !customerResult.length) {
+        console.error("Error retrieving customer ID:", error);
+        return res.status(500).json({ message: "Customer not found", status: 500 });
+      }
+
+      const customerId = customerResult[0].customer_id;
+
+      // Query for FCM token using customer_id
+      const tokenQuery = `SELECT fcm_token FROM customer WHERE customer_id=${customerId}`;
+
+      db.query(tokenQuery, (error, tokenResult) => {
+        if (error || !tokenResult.length) {
+          console.error("Error retrieving FCM token:", error);
+          return res.status(500).json({ message: "Token not found", status: 500 });
+        }
+
+        const registrationToken = tokenResult[0].fcm_token;
+
+        
+
+        // Send FCM notification
+        const sendNotification = async (registrationToken) => {
+          const messageSend = {
+            token: registrationToken,
+            notification: {
+              title: "Request declined!",
+              body: `Order: ${id} has been declined. Await for further confirmation...`
+            },
+            data: {
+              key1: "value1",
+              key2: "value2"
+            },
+            android: {
+              priority: "high"
+            },
+            apns: {
+              payload: {
+                aps: {
+                  badge: 42
+                }
+              }
+            }
+          };
+
+          try {
+            const response = await admin.messaging().send(messageSend);
+            console.log("Successfully sent message:", response);
+          } catch (error) {
+            console.error("Error sending message:", error);
+          }
+        };
+
+        // Call the sendNotification function with the retrieved token and technician name
+        sendNotification(registrationToken);
+        return res.status(200).json({ message: "Order declined successfully", status: 200 });
+        
+      });
+    });
+    
   });
 }
 
@@ -975,11 +1037,82 @@ function cancelOrder(req, res) {
 
   db.query(declineOrderQuery, (error, rows) => {
     if (error) {
-      throw error;
+      console.error("Error cancelling request:", error);
+      return res.status(500).json({ message: "Database error", status: 500 });
     }
-    return res
-      .status(200)
-      .json({ message: "Order cancelled successfully", status: 200 });
+
+    // Query for customer_id using the order_id
+    const customerIdQuery = `SELECT customer_id FROM ordertable WHERE order_id=${id}`;
+    
+    db.query(customerIdQuery, (error, customerResult) => {
+      if (error || !customerResult.length) {
+        console.error("Error retrieving customer ID:", error);
+        return res.status(500).json({ message: "Customer not found", status: 500 });
+      }
+
+      const customerId = customerResult[0].customer_id;
+
+      // Query for FCM token using customer_id
+      const tokenQuery = `SELECT fcm_token FROM customer WHERE customer_id=${customerId}`;
+
+      db.query(tokenQuery, (error, tokenResult) => {
+        if (error || !tokenResult.length) {
+          console.error("Error retrieving FCM token:", error);
+          return res.status(500).json({ message: "Token not found", status: 500 });
+        }
+
+        const registrationToken = tokenResult[0].fcm_token;
+
+        // Query for technician's name using technician_id
+        const technicianNameQuery = `SELECT name FROM technician WHERE technician_id=${technician_id}`;
+
+        db.query(technicianNameQuery, (error, technicianResult) => {
+          if (error || !technicianResult.length) {
+            console.error("Error retrieving technician name:", error);
+            return res.status(500).json({ message: "Technician not found", status: 500 });
+          }
+
+          const technicianName = technicianResult[0].name;
+
+          // Send FCM notification
+          const sendNotification = async (registrationToken) => {
+            const messageSend = {
+              token: registrationToken,
+              notification: {
+                title: "Request Cancelled!",
+                body: `Order: ${id} has been cancelled.`
+              },
+              data: {
+                key1: "value1",
+                key2: "value2"
+              },
+              android: {
+                priority: "high"
+              },
+              apns: {
+                payload: {
+                  aps: {
+                    badge: 42
+                  }
+                }
+              }
+            };
+
+            try {
+              const response = await admin.messaging().send(messageSend);
+              console.log("Successfully sent message:", response);
+            } catch (error) {
+              console.error("Error sending message:", error);
+            }
+          };
+
+          // Call the sendNotification function with the retrieved token and technician name
+          sendNotification(registrationToken);
+          return res.status(200).json({ message: "Order cancelled successfully", status: 200 });
+        });
+      });
+    });
+    
   });
 }
 

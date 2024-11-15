@@ -201,6 +201,7 @@ function fetchTechnicians() {
       list.innerHTML = "";
       console.log(data.result);
       data.result.forEach((item) => {
+        const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`;
         const row = `<tr>
                     <td>${item.technician_id}</td>
                     <td>${item.name}</td>
@@ -208,6 +209,7 @@ function fetchTechnicians() {
                     <td>${item.email}</td>
                     <td>${item.specialization}</td>
                     <td>${item.phone_number}</td>
+                    <td><a href="${googleMapsLink}" target="_blank">${item.latitude},${item.longitude}</a></td>
                 </tr>`;
         list.innerHTML += row;
       });
