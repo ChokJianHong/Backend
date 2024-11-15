@@ -204,8 +204,108 @@ function sendLocation(req, res) {
   });
 }
 
-function updateFCMTokenTechnician(req, res){
-  
+async function updateTechnicianArrivalTime(req, res) {
+  const { orderid } = req.params; // Get the order ID from URL parameters
+  const { start_time } = req.body; // Get the start time from the request body
+
+  if (!start_time) {
+    return res.status(400).json({
+      success: false,
+      message: 'start_time is required'
+    });
+  }
+
+  try {
+    // Update the order's start_time in the MySQL database
+    const [result] = await db.query(
+      `UPDATE ordertable SET technician_start_time = ${Date(start_time)} WHERE order_id = ${orderid}`,
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Technician arrival time updated successfully',
+    });
+  } catch (error) {
+    console.error('Error updating technician arrival time:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating technician arrival time'
+    });
+  }
+}
+
+async function changeTechnicianStatus(req, res) {
+  const technicianId = req.params.id
+  const { status } = req.body;
+
+  try {
+    // Update the order's start_time in the MySQL database
+    const [result] = await db.query(
+      `UPDATE technician SET status = ${status} WHERE technician_id = ${technicianId}`,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Technician arrival time updated successfully',
+    });
+  } catch (error) {
+    console.error('Error updating technician arrival time:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating technician arrival time'
+    });
+  }
+}
+
+
+async function updateTechnicianArrivalTime(req, res) {
+  const { orderid } = req.params; // Get the order ID from URL parameters
+  const { start_time } = req.body; // Get the start time from the request body
+
+  if (!start_time) {
+    return res.status(400).json({
+      success: false,
+      message: 'start_time is required'
+    });
+  }
+
+  try {
+    // Update the order's start_time in the MySQL database
+    const [result] = await db.query(
+      `UPDATE ordertable SET technician_start_time = ${Date(start_time)} WHERE order_id = ${orderid}`,
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Technician arrival time updated successfully',
+    });
+  } catch (error) {
+    console.error('Error updating technician arrival time:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating technician arrival time'
+    });
+  }
+}
+
+
+
+function updateFCMTokenTechnician(req, res) {
+
   const { technicianId, fcmToken } =
     req.body;
   // Update the database with the generated token
@@ -228,6 +328,25 @@ function updateFCMTokenTechnician(req, res){
 }
 
 
+function declineOrderForTechnician(req, res) {
+  const { type } = req.user;
+  const { cancel_details } = req.body;
+  if (type === "customer") {
+    return res.status(401).json({ message: "Unauthorized", status: 401 });
+  }
+
+  const { id } = req.params;
+  const declineOrderQuery = `UPDATE ordertable SET technician_id=${technician_id}, order_status='pending', cancel_details='${cancel_details}' WHERE order_id='${id}'`;
+  db.query(declineOrderQuery, (error) => {
+    if (error) {
+      throw error;
+    }
+    return res
+      .status(200)
+      .json({ message: "Order declined successfully", status: 200 });
+  });
+}
+
 
 
 module.exports = {
@@ -238,5 +357,8 @@ module.exports = {
   deleteTechnician,
   getTechnicianByToken,
   sendLocation,
+  updateTechnicianArrivalTime,
+  changeTechnicianStatus,
   updateFCMTokenTechnician,
+  declineOrderForTechnician
 };

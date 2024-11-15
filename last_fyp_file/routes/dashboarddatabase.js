@@ -23,7 +23,6 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
-  getCustomerLocation,
   updateFCMToken
 } = require("../controllers/customerController");
 
@@ -76,7 +75,10 @@ const {
   deleteTechnician,
   getTechnicianByToken,
   sendLocation,
+  updateTechnicianArrivalTime,
+  changeTechnicianStatus,
   updateFCMTokenTechnician,
+  declineOrderForTechnician,
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -85,7 +87,7 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
-const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician } = require("../controllers/requestController");
+const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes
 router.post("/login", login);
@@ -104,6 +106,7 @@ router.post("/customer/:id", decodeToken, updateFCMToken);
 router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
 router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
+router.put("/technician/:id/decline-request", decodeToken, declineOrderForTechnician);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
@@ -121,6 +124,8 @@ router.get("/orders/problem-stats", decodeToken, viewProblemStatistics);//new
 router.get("/orders/status-stats", decodeToken, viewOrderStatusStatistics);//new
 router.get("/orders/completed-sales-stats", decodeToken, viewCompletedOrderSales);//new
 router.get("/orders/spare-parts", decodeToken, viewTopSpareParts);//new
+router.put("/technician/status/:id", decodeToken, changeTechnicianStatus);
+
 
 
 router.get("/orders/:id", decodeToken, getOrderById);// new_addition
@@ -141,7 +146,7 @@ router.get("/orders/review",decodeToken, viewReview);//new
 
 router.get("/orders/:id/request-detail", decodeToken, viewRequestDetail);
 router.get("/orders/pending/count", decodeToken, pendingOrdersCount);
-
+router.put("/technician/arrive/", updateTechnicianArrivalTime);
 router.get("/orders/completed/count", decodeToken, completedOrdersCount);
 router.get("/orders/ongoing/count", decodeToken, ongoingOrdersCount);
 // admin routes
@@ -171,6 +176,7 @@ router.get("/request", getAllRequestForms);
 router.delete("/request/:id", deleteRequestForm);
 router.get("/request/:id", getRequestFormById);
 router.get("/request/technician/:name", getRequestFormsByTechnician);
+router.put('/request/technician/:technicianId/:orderId', trackOrderStatus);
 
 // inventory// new_addition
 

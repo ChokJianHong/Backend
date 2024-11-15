@@ -212,6 +212,81 @@ function getRequestFormById(req, res) {
   });
 }
 
+// Track the order status and update technician's status
+function trackOrderStatus(req, res) {
+  // Get the technicianId and orderId from the request parameters
+  const technicianId = req.params.technicianId;
+  const orderId = req.params.orderId;
+
+  console.log('Received technicianId:', technicianId);
+  console.log('Received orderId:', orderId);
+
+  // Query to check the request form status and request_time
+  const query = `
+    SELECT status, request_time 
+    FROM request_forms 
+    WHERE order_id = ${orderId};  // Direct interpolation
+  `;
+  
+  // Execute the query
+  connection.execute(query, (err, results) => {
+    if (err) {
+      console.error('Error executing database query:', err);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+
+    // Check if the order was found
+    if (results.length > 0) {
+      const orderStatus = results[0].status;
+      const requestTime = results[0].request_time;
+      const currentTime = new Date();
+
+      // Check if the request status is pending and if 20 minutes have passed
+      const timeDifference = (currentTime - new Date(requestTime)) / (1000 * 60); // Time difference in minutes
+
+      if (orderStatus === 'pending' && timeDifference >= 20) {
+        // Change technician status to 'free' if 20 minutes have passed and status is still 'pending'
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'free' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to free');
+          return res.status(200).json({ message: 'Technician status updated to free' });
+        });
+      } else if (orderStatus === 'complete' && timeDifference <= 20) {
+        // Change technician status to 'working' if order status is complete within 20 minutes
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'working' 
+          WHERE technician_id = ${technicianId};  
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to working');
+          return res.status(200).json({ message: 'Technician status updated to working' });
+        });
+      } else {
+        return res.status(200).json({ message: 'No status update needed' });
+      }
+    } else {
+      console.error('Order not found');
+      return res.status(404).json({ error: 'Order not found' });
+    }
+  });
+}
+
+
 
 module.exports = {
   createRequestForm,
@@ -219,5 +294,6 @@ module.exports = {
   getAllRequestForms,
   deleteRequestForm,
   getRequestFormById,
-  getRequestFormsByTechnician
+  getRequestFormsByTechnician,
+  trackOrderStatus,
 };
