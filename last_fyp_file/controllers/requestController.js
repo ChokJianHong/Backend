@@ -43,79 +43,46 @@ function updateRequestFormStatus(req, res) {
     return res.status(400).json({ message: "Invalid status" });
   }
 
-  // Use string interpolation to build the query
+  // Update request form status
   const updateRequestFormQuery = `
-        UPDATE request_forms
-        SET status = '${status}'
-        WHERE id = '${id}'
-    `;
+    UPDATE request_forms
+    SET status = '${status}'
+    WHERE id = '${id}'
+  `;
 
-  // Execute the query
   db.query(updateRequestFormQuery, (error, results) => {
     if (error) {
-      console.error("Error updating status:", error);
-      return res.status(500).json({ message: "Database error", status: 500 });
+      return res.status(500).json({ message: "Database error", error });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Request form not found" });
     }
 
-    // Query for technician_id using the order_id
-    const technicianIdQuery = `SELECT technician_id FROM ordertable WHERE order_id=${id}`;
-    
-    db.query(technicianIdQuery, (error, technicianResult) => {
-      if (error || !technicianResult.length) {
-        console.error("Error retrieving customer ID:", error);
-        return res.status(500).json({ message: "Customer not found", status: 500 });
-      }
+    // Check if the status is "completed" to update stockAmount
+    if (status === 'complete') {
+      // Query to reduce stock amount by 1 in inventory based on parts_needed in request_forms
+      const reduceStockQuery = `
+        UPDATE inventory 
+        SET stockAmount = stockAmount - 1 
+        WHERE name = (
+          SELECT parts_needed FROM request_forms WHERE id = '${id}'
+        ) AND stockAmount > 0;
+      `;
 
-      const technicianId = technicianResult[0].technician_id;
-
-      // Query for FCM token using customer_id
-      const tokenQuery = `SELECT fcm_token FROM technician WHERE technician_id=${technicianId}`;
-
-      db.query(tokenQuery, (error, tokenResult) => {
-        if (error || !tokenResult.length) {
-          console.error("Error retrieving FCM token:", error);
-          return res.status(500).json({ message: "Token not found", status: 500 });
+      db.query(reduceStockQuery, (error, stockResults) => {
+        if (error) {
+          return res.status(500).json({ message: "Error updating stock amount", error });
         }
-
-        const registrationToken = tokenResult[0].fcm_token;
-
-        // Send FCM notification
-        const sendNotification = async (registrationToken) => {
-          const messageSend = {
-            token: registrationToken,
-            notification: {
-              title: "Spare-Part Request Updated!",
-              body: `Spare-part is available for Order: ${id}`
-            },
-            data: {
-              key1: "value1",
-              key2: "value2"
-            },
-            android: {
-              priority: "high"
-            },
-            apns: {
-              payload: {
-                aps: {
-                  badge: 42
-                }
-              }
-            }
-          };
-
-          try {
-            const response = await admin.messaging().send(messageSend);
-            console.log("Successfully sent message:", response);
-          } catch (error) {
-            console.error("Error sending message:", error);
-          }
-        };
-
-        // Call the sendNotification function with the retrieved token and technician name
-        sendNotification(registrationToken);
-        return res.status(200).json({ message: "Request form status updated successfully" });        
+        // Check if stock was successfully reduced
+        if (stockResults.affectedRows === 0) {
+          return res.status(404).json({ message: "Stock not available or item not found in inventory" });
+        }
+        return res.status(200).json({ message: "Request form status updated and stock adjusted successfully" });
       });
-    });
+    } else {
+      // If the status is not "complete," just return success for the status update
+      return res.status(200).json({ message: "Request form status updated successfully" });
+    }
   });
 }
 
