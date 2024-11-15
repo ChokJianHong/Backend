@@ -341,7 +341,9 @@ function assignTechnician(req, res) {
       .status(200)
       .json({ message: "Order assigned successfully", status: 200 });
   });
+  
   const sendNotification = async (registrationToken) => {
+
     const messageSend = {
       token: registrationToken,
       notification: {
@@ -364,6 +366,7 @@ function assignTechnician(req, res) {
       }
     };
 
+
     admin
       .messaging()
       .send(messageSend)
@@ -374,7 +377,8 @@ function assignTechnician(req, res) {
         console.error("Error sending message:", error);
       });
   };
-  const registrationToken = "crjrc9pBR1y-XIy1pdz0uh:APA91bETKJYrM2b1PFNmXr4nUq5zpFOeYkUMXYukdYV501wj4cY4YYZ7xyZqRQ7iOjVB9uHdKiHQvP6CtKjrZOdXTyfP87ALGqVnRAMUtNThVYVJoGyWwlk";
+  const registrationToken = "fgNKh7EOQLu0clw3fCp34q:APA91bFpxwmdC2SoA6d6PZZcpSyYv_6KOX8mXaxoA8gkrK9d5nVvyf6XzbmHPqyi3vhwOjS7KWtpZWqR0VLZz1zD8B5VssMrABoiXgxDIVMoYnK9-jbd9OA";
+  
 
 
   sendNotification(registrationToken);
@@ -1116,10 +1120,38 @@ function cancelOrder(req, res) {
   });
 }
 
+const viewReview = (req, res) => {
+  const { type } = req.user;
+
+  // Check if the user is an admin
+  if (type !== "admin") {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  // SQL query to select reviews from completed orders
+  const viewReviewQuery = `
+      SELECT o.order_id, t.name AS technician_name, o.rating, o.review_text, o.review_date, o.location_details AS address
+      FROM ordertable o
+      JOIN technician t ON o.technician_id = t.technician_id
+      WHERE o.rating IS NOT NULL 
+        AND o.review_text IS NOT NULL 
+        AND o.order_status = 'completed'
+  `;
+
+  // Execute the query
+  db.query(viewReviewQuery, (error, reviews) => {
+      if (error) {
+          console.error("Error fetching reviews:", error);
+          return res.status(500).json({ message: "Failed to fetch reviews", status: 500 });
+      }
+
+      // Return the fetched reviews in the response
+      return res.status(200).json(reviews);
+  });
+}
 
 
 module.exports = {
-
+  viewReview,
   viewTopSpareParts,
   viewOrderStatusStatistics,
   viewProblemStatistics,
@@ -1146,3 +1178,4 @@ module.exports = {
   getPendingOrders,
   cancelOrder
 };
+

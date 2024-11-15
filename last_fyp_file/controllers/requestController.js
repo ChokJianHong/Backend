@@ -43,79 +43,46 @@ function updateRequestFormStatus(req, res) {
     return res.status(400).json({ message: "Invalid status" });
   }
 
-  // Use string interpolation to build the query
+  // Update request form status
   const updateRequestFormQuery = `
-        UPDATE request_forms
-        SET status = '${status}'
-        WHERE id = '${id}'
-    `;
+    UPDATE request_forms
+    SET status = '${status}'
+    WHERE id = '${id}'
+  `;
 
-  // Execute the query
   db.query(updateRequestFormQuery, (error, results) => {
     if (error) {
-      console.error("Error updating status:", error);
-      return res.status(500).json({ message: "Database error", status: 500 });
+      return res.status(500).json({ message: "Database error", error });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Request form not found" });
     }
 
-    // Query for technician_id using the order_id
-    const technicianIdQuery = `SELECT technician_id FROM ordertable WHERE order_id=${id}`;
-    
-    db.query(technicianIdQuery, (error, technicianResult) => {
-      if (error || !technicianResult.length) {
-        console.error("Error retrieving customer ID:", error);
-        return res.status(500).json({ message: "Customer not found", status: 500 });
-      }
+    // Check if the status is "completed" to update stockAmount
+    if (status === 'complete') {
+      // Query to reduce stock amount by 1 in inventory based on parts_needed in request_forms
+      const reduceStockQuery = `
+        UPDATE inventory 
+        SET stockAmount = stockAmount - 1 
+        WHERE name = (
+          SELECT parts_needed FROM request_forms WHERE id = '${id}'
+        ) AND stockAmount > 0;
+      `;
 
-      const technicianId = technicianResult[0].technician_id;
-
-      // Query for FCM token using customer_id
-      const tokenQuery = `SELECT fcm_token FROM technician WHERE technician_id=${technicianId}`;
-
-      db.query(tokenQuery, (error, tokenResult) => {
-        if (error || !tokenResult.length) {
-          console.error("Error retrieving FCM token:", error);
-          return res.status(500).json({ message: "Token not found", status: 500 });
+      db.query(reduceStockQuery, (error, stockResults) => {
+        if (error) {
+          return res.status(500).json({ message: "Error updating stock amount", error });
         }
-
-        const registrationToken = tokenResult[0].fcm_token;
-
-        // Send FCM notification
-        const sendNotification = async (registrationToken) => {
-          const messageSend = {
-            token: registrationToken,
-            notification: {
-              title: "Spare-Part Request Updated!",
-              body: `Spare-part is available for Order: ${id}`
-            },
-            data: {
-              key1: "value1",
-              key2: "value2"
-            },
-            android: {
-              priority: "high"
-            },
-            apns: {
-              payload: {
-                aps: {
-                  badge: 42
-                }
-              }
-            }
-          };
-
-          try {
-            const response = await admin.messaging().send(messageSend);
-            console.log("Successfully sent message:", response);
-          } catch (error) {
-            console.error("Error sending message:", error);
-          }
-        };
-
-        // Call the sendNotification function with the retrieved token and technician name
-        sendNotification(registrationToken);
-        return res.status(200).json({ message: "Request form status updated successfully" });        
+        // Check if stock was successfully reduced
+        if (stockResults.affectedRows === 0) {
+          return res.status(404).json({ message: "Stock not available or item not found in inventory" });
+        }
+        return res.status(200).json({ message: "Request form status updated and stock adjusted successfully" });
       });
-    });
+    } else {
+      // If the status is not "complete," just return success for the status update
+      return res.status(200).json({ message: "Request form status updated successfully" });
+    }
   });
 }
 
@@ -212,54 +179,80 @@ function getRequestFormById(req, res) {
   });
 }
 
-// Function to track the order status
-function trackOrderStatus(orderId, technicianId) {
-  const timer = setTimeout(() => {
-    // Direct string interpolation (not safe for user input)
-    const query = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
-    
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        return;
-      }
+// Track the order status and update technician's status
+function trackOrderStatus(req, res) {
+  // Get the technicianId and orderId from the request parameters
+  const technicianId = req.params.technicianId;
+  const orderId = req.params.orderId;
 
-      if (results.length > 0 && results[0].status === 'pending') {
-        // Direct string interpolation for the update query
-        const updateQuery = `UPDATE technicians SET status = 'free', ongoing_order_id = NULL WHERE technician_id = ${technicianId}`;
-        db.query(updateQuery, (updateErr) => {
-          if (updateErr) {
-            console.error('Error updating technician status:', updateErr);
-          } else {
-            console.log(`Technician ${technicianId} status set to free for pending order ${orderId}`);
-          }
-        });
-      }
-    });
-  }, 20 * 60 * 1000); // 20 minutes timer
+  console.log('Received technicianId:', technicianId);
+  console.log('Received orderId:', orderId);
 
-  const initialQuery = `SELECT status FROM request_forms WHERE order_id = ${orderId}`;
-  db.query(initialQuery, (err, results) => {
+  // Query to check the request form status and request_time
+  const query = `
+    SELECT status, request_time 
+    FROM request_forms 
+    WHERE order_id = ${orderId};  // Direct interpolation
+  `;
+  
+  // Execute the query
+  connection.execute(query, (err, results) => {
     if (err) {
-      console.error('Error executing initial query:', err);
-      return;
+      console.error('Error executing database query:', err);
+      return res.status(500).json({ error: 'Database query error' });
     }
 
-    if (results.length > 0 && results[0].status === 'complete') {
-      clearTimeout(timer);
+    // Check if the order was found
+    if (results.length > 0) {
+      const orderStatus = results[0].status;
+      const requestTime = results[0].request_time;
+      const currentTime = new Date();
 
-      // Direct string interpolation for the update query
-      const updateQuery = `UPDATE technicians SET status = 'working', ongoing_order_id = ${orderId} WHERE technician_id = ${technicianId}`;
-      db.query(updateQuery, (updateErr) => {
-        if (updateErr) {
-          console.error('Error updating technician status:', updateErr);
-        } else {
-          console.log(`Technician ${technicianId} status set to busy for order ${orderId}`);
-        }
-      });
+      // Check if the request status is pending and if 20 minutes have passed
+      const timeDifference = (currentTime - new Date(requestTime)) / (1000 * 60); // Time difference in minutes
+
+      if (orderStatus === 'pending' && timeDifference >= 20) {
+        // Change technician status to 'free' if 20 minutes have passed and status is still 'pending'
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'free' 
+          WHERE technician_id = ${technicianId};  // Direct interpolation
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to free');
+          return res.status(200).json({ message: 'Technician status updated to free' });
+        });
+      } else if (orderStatus === 'complete' && timeDifference <= 20) {
+        // Change technician status to 'working' if order status is complete within 20 minutes
+        const updateQuery = `
+          UPDATE technicians 
+          SET status = 'working' 
+          WHERE technician_id = ${technicianId};  
+        `;
+
+        connection.execute(updateQuery, (err, results) => {
+          if (err) {
+            console.error('Error updating technician status:', err);
+            return res.status(500).json({ error: 'Failed to update technician status' });
+          }
+          console.log('Technician status updated to working');
+          return res.status(200).json({ message: 'Technician status updated to working' });
+        });
+      } else {
+        return res.status(200).json({ message: 'No status update needed' });
+      }
+    } else {
+      console.error('Order not found');
+      return res.status(404).json({ error: 'Order not found' });
     }
   });
 }
+
 
 
 module.exports = {

@@ -22,7 +22,7 @@ async function registerAdmin(req, res) {
       if (error) {
         return res.status(500).json({ status: 500, message: "Internal Server Error" });
       }
-      
+
       if (rows.length > 0) {
         return res.status(400).json({ status: 400, message: "Admin with this email already exists" });
       }
@@ -65,7 +65,6 @@ async function registerAdmin(req, res) {
 
 function login(req, res) {
   const { email, password, userType } = req.body;
-  console.log(req.body);
 
   let isUserExistQuery = "";
   if (userType === "customer") {
@@ -87,21 +86,20 @@ function login(req, res) {
     if (error) {
       return res.status(500).json({ status: 500, message: "Internal Server Error" });
     }
-    
+
     if (rows.length === 0) {
       return res.status(401).json({ status: 401, message: "Invalid email or password" });
     }
 
     // Compare the provided password with the hashed password in the database
     const hashedPassword = rows[0].password || rows[0].admin_password;
-    console.log("pass", password, hashedPassword)
     const isMatch = await bcrypt.compare(password, hashedPassword);
-    
+
     if (!isMatch) {
       return res.status(401).json({ status: 401, message: "Invalid email or password" });
     }
 
-    // Generate token if password matches
+    // Generate JWT if password matches
     const token = generateToken({
       userId: rows[0][userTypeIds[userType]],
       email,
@@ -128,7 +126,8 @@ function login(req, res) {
     });
   });
 }
- 
+
+
 
 function changePassword(req, res) {
   const { userId, type } = req.user;
@@ -338,4 +337,4 @@ function getLastLogin(req, res) {
   });
 }
 
-module.exports = { login, changePassword, forgotPassword, resetPassword,registerAdmin , lastLogin , getLastLogin};
+module.exports = { login, changePassword, forgotPassword, resetPassword, registerAdmin, lastLogin, getLastLogin };

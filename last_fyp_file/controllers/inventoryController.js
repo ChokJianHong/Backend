@@ -3,18 +3,19 @@
 const db = require("../utils/database"); // Ensure you have a database utility
 
 const createInventoryItem = async (req, res) => {
-    const { name, features, stockAmount, image } = req.body;
+    const { name, features, stockAmount, image, price } = req.body;
 
     // Check if all fields are provided
-    if (!name || !features || !stockAmount || !image) {
+    if (!name || !features || !stockAmount || !image || !price) {
         return res.status(400).json({ message: "All fields are required" });
     }
+    
 
     try {
         // Build the SQL query string with string interpolation
         const createInventoryQuery = `
-            INSERT INTO inventory (name, image, features, stockAmount)
-            VALUES ('${name}', '${image}', '${JSON.stringify(features)}', '${stockAmount}')
+            INSERT INTO inventory (name, image, features, stockAmount,price)
+            VALUES ('${name}', '${image}', '${JSON.stringify(features)}', '${stockAmount}','${price}')
         `;
 
         // Execute the query
@@ -71,11 +72,11 @@ const getInventoryItemById = async (req, res) => {
 };
 const updateInventoryItem = async (req, res) => {
     const { id } = req.params;  // Get the item ID from the request parameters
-    const { name, image, features, stockAmount } = req.body;  // Get new data from the request body
+    const { name, image, features, stockAmount,price } = req.body;  // Get new data from the request body
 
     // Ensure all fields are provided
-    if (!name || !image || !features || !stockAmount) {
-        return res.status(400).json({ message: 'All fields (name, image, features, stockAmount) are required' });
+    if (!name || !image || !features || !stockAmount || !price) {
+        return res.status(400).json({ message: 'All fields (name, image, features, stockAmount,price) are required' });
     }
 
     try {
@@ -85,7 +86,7 @@ const updateInventoryItem = async (req, res) => {
         // Build the SQL query string using string interpolation
         const updateInventoryQuery = `
             UPDATE inventory 
-            SET name = '${name}', image = '${image}', features = '${featuresString}', stockAmount = '${stockAmount}'
+            SET name = '${name}', image = '${image}', features = '${featuresString}', stockAmount = '${stockAmount}',price='${price}'
             WHERE id = '${id}'
         `;
 
@@ -135,6 +136,7 @@ const deleteInventoryItem = async (req, res) => {
     }
 };
 
+
 async function getInventoryItemByName(req, res) {
     const query = req.query.query;
 
@@ -165,6 +167,7 @@ async function getInventoryItemByName(req, res) {
         res.status(500).json({ error: 'Failed to fetch inventory items' });
     }
 }
+
 
 
 

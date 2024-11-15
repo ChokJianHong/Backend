@@ -1,115 +1,69 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const baseUrl = "http://localhost:5005/dashboarddatabase";
-  
-    const logout = document.getElementById("logout");
-    logout.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-    });
-  
-    const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", function () {
+  const baseURL = "http://localhost:5005/dashboarddatabase";
+
+  async function fetchReviews() {
+    const token = localStorage.getItem('token');
     if (!token) {
-      window.location.href = "login.html";
+      console.error("No token found. Redirecting to login.");
+      window.location.href = "/login.html";
+      return;
     }
-    const fetchData = (orderId) => {
-      fetch(`${baseUrl}/orders/${orderId}/invoice`, {
-        method: "GET",
+
+    const loadingSpinner = document.getElementById("loading-spinner");
+    loadingSpinner.style.display = "block"; // Show the loading spinner
+
+    try {
+      const response = await fetch(`${baseURL}/orders/review`, {
+        method: 'GET',
         headers: {
           "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token"),
+          Authorization: token,
         },
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((result) => {
-          const data = result.result;
-          console.log(data);
-          document.getElementById(
-            "customer-name"
-          ).innerText = data.customer_name;
-          document.getElementById(
-            "customer-address"
-          ).innerText = data.customer_address;
-          if (data.rating == 1) {
-            const ratingElements = document.getElementsByClassName("rating");
-            if (ratingElements.length > 0) {
-              ratingElements[0].innerHTML = `
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-              `;
-            }
-          }
-          else if(data.rating == 2){
-            const ratingElements = document.getElementsByClassName("rating");
-            if (ratingElements.length > 0) {
-              ratingElements[0].innerHTML = `
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-              `;
-            }
-          }
-          else if(data.rating == 3){
-            const ratingElements = document.getElementsByClassName("rating");
-            if (ratingElements.length > 0) {
-              ratingElements[0].innerHTML = `
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star notChecked"></span>
-                <span class="fa fa-star notChecked"></span>
-              `;
-            }
-          }
-          else if(data.rating == 4){
-            const ratingElements = document.getElementsByClassName("rating");
-            if (ratingElements.length > 0) {
-              ratingElements[0].innerHTML = `
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star notChecked"></span>
-              `;
-            }
-          }
-          else if(data.rating == 5){
-            const ratingElements = document.getElementsByClassName("rating");
-            if (ratingElements.length > 0) {
-              ratingElements[0].innerHTML = `
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-              `;
-            }
-          }
+      });
 
-          document.getElementById(
-            "review-text"
-          ).innerText = data.review_text;
-          const reviewDateElement = document.getElementById("review-date");
-          reviewDateElement.innerText = formatDate(data.review_date);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    };
-  
-    const formatDate = (isoString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const date = new Date(isoString);
-        return date.toLocaleDateString(undefined, options);
-    };
+      if (!response.ok) {
+        throw new Error(`Error fetching reviews: ${response.status}`);
+      }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get("id");
-    fetchData(orderId);
-  });
+      const reviews = await response.json();
+      displayReviews(reviews);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      loadingSpinner.style.display = "none"; // Hide the spinner
+    }
+  }
+
+  function displayReviews(reviews) {
+    const reviewContainer = document.getElementById("review-container");
+    reviewContainer.innerHTML = ''; // Clear any previous reviews
+
+    if (reviews.length === 0) {
+      reviewContainer.innerHTML = "<p>No reviews available.</p>";
+      return;
+    }
+
+    reviews.forEach((review) => {
+      const reviewHtml = `
+        <div class="col-md-6 offset-md-3">
+          <div class="review-card">
+            <p><strong>Technician:</strong> ${review.technician_name || 'N/A'}</p>
+            <p><strong>Location:</strong> ${review.address || 'Address not provided'}</p>
+            <p><strong>Rating:</strong> ${review.rating || 'No rating available'}</p>
+            <p><strong>Review:</strong> ${review.review_text || 'No comments available'}</p>
+            <p><strong>Date:</strong> ${review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Date not available'}</p>
+          </div>
+        </div>
+      `;
+      reviewContainer.innerHTML += reviewHtml;
+    });
+  }
+
+  function getStarRating(rating) {
+    const filledStars = Math.floor(rating);
+    const emptyStars = 5 - filledStars;
+    return '★'.repeat(filledStars) + '☆'.repeat(emptyStars);
+  }
+
+  fetchReviews();
+});

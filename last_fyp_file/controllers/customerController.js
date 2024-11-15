@@ -40,6 +40,7 @@ function customerRegister(req, res) {
   });
 }
 
+
 function getCustomerLocation(req, res) {
   const customerId = req.params.id;
 
@@ -179,10 +180,17 @@ function updateCustomer(req, res) {
   updateCustomerQuery = autogate_brand
     ? `${updateCustomerQuery}, auto_gate_brand = '${autogate_brand}'`
     : updateCustomerQuery;
+
+    updateCustomerQuery = auto_gate_warranty
+    ? `${updateCustomerQuery}, auto_gate_warranty = '${auto_gate_warranty}'`
+    : updateCustomerQuery;
+    updateCustomerQuery = alarm_waranty
+
   updateCustomerQuery = auto_gate_warranty
     ? `${updateCustomerQuery}, auto_gate_warranty = '${auto_gate_warranty}'`
     : updateCustomerQuery;
   updateCustomerQuery = alarm_waranty
+
     ? `${updateCustomerQuery}, alarm_waranty = '${alarm_waranty}'`
     : updateCustomerQuery;
   updateCustomerQuery = `${updateCustomerQuery} WHERE customer_id = ${customerId}`;

@@ -2,28 +2,27 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   const apiUrl = 'http://localhost:5005/dashboarddatabase/inventory'; // Replace with your actual API URL
-
   const token = localStorage.getItem("token"); // Retrieve token from local storage
+
   const reqHeader = {
     "Content-Type": "application/json",
     Authorization: `${token}`, // Include token in Authorization header
-  }
+  };
 
-  // Function to fetch and display inventory items
-  async function fetchInventoryItems() {
+ 
+
+  // Modify fetchInventoryItems to accept a dynamic URL
+  async function fetchInventoryItems(url = apiUrl) {
     try {
-      if (!token) {
-        console.error("No token found in local storage");
-        return Promise.reject(new Error("No token found in local storage"));
-      }
-      const response = await fetch(apiUrl, {
+      const response = await fetch(url, {
         method: 'GET',
         headers: reqHeader,
       });
       const data = await response.json();
-      console.log("data is ", data)
+
       const cardContainer = document.getElementById('inventory-card-container');
       cardContainer.innerHTML = '';  // Clear existing content
+
       data.forEach(item => {
         cardContainer.innerHTML += `
           <div class="card" style="width: 18rem; margin: 10px; border: 1px solid #ddd; border-radius: 5px; padding: 15px;">
@@ -32,13 +31,14 @@ document.addEventListener('DOMContentLoaded', function () {
               <h5 class="card-title">${item.name}</h5>
               <p class="card-text"><strong>Features:</strong> ${item.features}</p>
               <p class="card-text"><strong>Stock Amount:</strong> ${item.stockAmount}</p>
+              <p class="card-text"><strong>Price:</strong> ${item.price}</p>
+              <button class="btn btn-warning btn-sm" onclick="selectItem(${item.id})">Select</button>
               <button class="btn btn-warning btn-sm" onclick="editItem(${item.id})">Edit</button>
               <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Delete</button>
             </div>
           </div>
         `;
       });
-
     } catch (error) {
       console.error('Error fetching inventory items:', error);
     }
@@ -52,16 +52,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const name = document.getElementById('name').value;
     const image = document.getElementById('image').value;
     const features = document.getElementById('features').value
-    const stockAmount = document.getElementById('stockAmount').value;
+    const stockAmount = document.getElementById('stockAmount').value
+    const price = document.getElementById('price').value;
 
     try {
-      console.log(name, image, features, stockAmount);
+      console.log(name, image, features, stockAmount,price);
 
       // Send POST request to API
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: reqHeader,
-        body: JSON.stringify({ name, image, features, stockAmount })
+        body: JSON.stringify({ name, image, features, stockAmount,price })
       });
 
       // Check if the request was successful
@@ -69,7 +70,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('#name').value = '';
         document.querySelector('#image').value = '';
         document.querySelector('#features').value = '';
-        document.querySelector('#stockAmount').value = '';
+        document.querySelector('#stockAmount').value = ''; 
+        document.querySelector('#price').value = '';
 
         // Show success popup or alert
         Swal.fire({
@@ -103,6 +105,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('e_image').value = item.image;
         document.getElementById('e_features').value = item.features
         document.getElementById('e_stockAmount').value = item.stockAmount;
+        
+        document.getElementById('e_price').value = item.price;
         document.getElementById('e_item_id').value = item.id; // Set hidden ID field
 
         // Scroll to the top of the page where the form is located
@@ -124,12 +128,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const image = document.getElementById('e_image').value;
     const features = document.getElementById('e_features').value.split(',').map(f => f.trim());
     const stockAmount = document.getElementById('e_stockAmount').value;
+    const price = document.getElementById('e_price').value;
 
     try {
       const response = await fetch(`${apiUrl}/${id}`, {
         method: 'PUT',  // Assuming the API expects a PUT request for updating
         headers: reqHeader,
-        body: JSON.stringify({ name, image, features, stockAmount })
+        body: JSON.stringify({ name, image, features, stockAmount ,price})
       });
 
       if (response.ok) {
@@ -138,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('e_image').value = ""
         document.getElementById('e_features').value = ""
         document.getElementById('e_stockAmount').value = ""
+        document.getElementById('e_price').value = ""
         document.getElementById('e_item_id').value = "" // Set hidden ID field
         fetchInventoryItems();  // Refresh the list after updating
         Swal.fire({
@@ -179,10 +185,60 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
   }
+  let inventoryData = [];  // Global variable to store inventory items
+
+async function fetchInventoryItems(url = apiUrl) {
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: reqHeader,
+    });
+    const data = await response.json();
+
+    inventoryData = data;  // Store the fetched data globally
+    displayInventoryItems(inventoryData);  // Display all items initially
+
+  } catch (error) {
+    console.error('Error fetching inventory items:', error);
+  }
+}
+function displayInventoryItems(items) {
+  const cardContainer = document.getElementById('inventory-card-container');
+  cardContainer.innerHTML = '';  // Clear existing content
+
+  items.forEach(item => {
+    cardContainer.innerHTML += `
+      <div class="card" style="width: 18rem; margin: 10px; border: 1px solid #ddd; border-radius: 5px; padding: 15px;">
+        <img src="${item.image}" class="card-img-top" alt="${item.name}" style="width: 100%; height: auto;">
+        <div class="">
+          <h5 class="card-title">${item.name}</h5>
+          <p class="card-text"><strong>Features:</strong> ${item.features}</p>
+          <p class="card-text"><strong>Stock Amount:</strong> ${item.stockAmount}</p>
+          <p class="card-text"><strong>Price:</strong> ${item.price}</p>
+          <button class="btn btn-warning btn-sm" onclick="selectItem(${item.id})">Select</button>
+          <button class="btn btn-warning btn-sm" onclick="editItem(${item.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+}
+function searchInventory() {
+  const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+  const filteredItems = inventoryData.filter(item =>
+    item.name.toLowerCase().includes(searchQuery) ||
+    item.features.toLowerCase().includes(searchQuery)
+  );
+  displayInventoryItems(filteredItems);  // Display the filtered items
+}
+
+
+ 
 
   // Initialize
   document.getElementById('create-item-form').addEventListener('submit', createInventoryItem);
   fetchInventoryItems();
+  document.getElementById('searchInput').addEventListener('input', searchInventory);
 
 
 

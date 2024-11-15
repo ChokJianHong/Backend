@@ -131,22 +131,43 @@ function countCompletedOrders(count) {
 // Display Pending Orders
 function customerPendingOrders(orders) {
   const container = document.getElementById("customer-pending-orders");
+  container.innerHTML = ""; // Clear existing content
+
   if (orders.length === 0) {
-    container.innerHTML = "No pending orders found.";
+    container.innerHTML = "<tr><td colspan='4'>No pending orders found.</td></tr>";
+    return;
   }
+
   orders.forEach((order) => {
+    // Calculate days ago
+    const orderDate = new Date(order.order_date); // Assuming order_date is in a format like 'YYYY-MM-DD'
+    const today = new Date();
+    const diffTime = Math.abs(today - orderDate);
+    const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+
+    // Determine display text for days ago
+    let daysAgoText;
+    if (daysAgo === 0) {
+      daysAgoText = "Today";
+    } else if (daysAgo === 1) {
+      daysAgoText = "1 day ago";
+    } else {
+      daysAgoText = `${daysAgo} days ago`;
+    }
+
     container.innerHTML += `
-            <tr>
-                <td>#000${order.order_id}</td>
-                <td>${order.problem_type}</td>
-                <td class="${order.urgency_level.toLowerCase()}">${
-      order.urgency_level[0].toUpperCase() + order.urgency_level.substring(1)
-    }</td>
-                <td><a href="requests.html"><button>View</button></q></td>
-            </tr>
-        `;
+      <tr>
+        <td>#000${order.order_id}</td>
+        <td>${order.problem_type}</td>
+        <td class="${order.urgency_level.toLowerCase()}">
+          ${order.urgency_level[0].toUpperCase() + order.urgency_level.substring(1)} ( ${daysAgoText})
+        </td>
+        <td><a href="requests.html"><button>View</button></a></td>
+      </tr>
+    `;
   });
 }
+
 
 // Display Ongoing Orders
 function customerOngoingOrders(orders) {

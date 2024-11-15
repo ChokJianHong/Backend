@@ -20,13 +20,19 @@
 
 
 <div class="sidebar">
+  <!-- Add Logo at the top of sidebar -->
+  <div class="logo-container">
+    <a href="dashboard.html"><img src="images/logo.png" alt="AutoSecure Logo" class="sidebar-logo"></a>
+  </div>
+
   <!-- Sidebar content -->
+
   <ul>
-    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="dashboard.html" class="active">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
     <li><a href="inventory.html">Inventory</a></li>
     <li><a href="analysis.html">Business Analysis</a></li>
-    <li>Request</a></li>
+    <li>Request</li>
     <li><a href="requests.html" id="current-requests">Current Requests</a></li>
     <li><a href="history.html">Requests History</a></li>
     <li><a href="cancelled_history.html">Cancel History</a></li>
@@ -35,35 +41,23 @@
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
-    <!-- Additional links can be added here -->
+    <li><a href="view_review.html">Review</a></li>
+
   </ul>
   <button id="logout" class="logout-btn">Log Out</button>
 </div>
-
 <!-- Rest of your dashboard content -->
 
 <div class="dashboard-container">
   <div class="container">
-    <h1>Review</h1>
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="review-card">
-          <p><i class="fas fa-user"></i> <span class="customer-name" id="customer-name"></span></p>
-          <p><i class="fas fa-map-marker-alt"></i> <span class="customer-address" id="customer-address"></span></p>
-          <hr>
-          <div class="rating">
-            
-          </div>
-          <div class="review-text">
-            <p id="review-text"></p>
-          </div>
-          <hr>
-          <p><strong>Submitted on: </strong><span class="review-date" id="review-date"></span></p>
-        </div>
-      </div>
+    <h1> Reviews</h1>
+    <div id="review-container" class="row">
+      <!-- Reviews will be dynamically injected here by JavaScript -->
+      <div class="loading-spinner" id="loading-spinner"></div>
     </div>
   </div>
 </div>
+
 
 <script src="./view_review.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
