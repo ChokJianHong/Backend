@@ -87,7 +87,7 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
-const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
+const { createRequestForm,checkAvailability, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes
 router.post("/login", login);
@@ -173,6 +173,8 @@ router.post('/chat/sendMessage', sendMessage);
 // request form // new_addition
 router.post("/request", createRequestForm);
 router.put("/request/:id", updateRequestFormStatus);
+router.get('/request/availability', checkAvailability);
+
 router.get("/request", getAllRequestForms);
 router.delete("/request/:id", deleteRequestForm);
 router.get("/request/:id", getRequestFormById);
