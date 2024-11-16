@@ -44,7 +44,7 @@
     <li><a href="view_review.html">Review</a></li>
 
   </ul>
-  <button id="logout" class="logout-btn">Log Out</button>
+  <button id="logout" class="logout-btn" onclick="logout()">Log Out</button></div>
 </div>
 <!-- Rest of your dashboard content -->
 
@@ -58,6 +58,39 @@
   </div>
 </div>
 
+
+<script>
+  const links = document.querySelectorAll('.sidebar ul li a');
+
+  // Function to set the active class on the current link
+  function setActiveLink(link) {
+    links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+    link.classList.add('active'); // Add active class to the clicked link
+    localStorage.setItem('activeLink', link.href); // Store the current link in localStorage
+  }
+
+  // Apply the active class to the stored link on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const activeLink = localStorage.getItem('activeLink');
+    links.forEach(link => {
+      if (link.href === activeLink) {
+        link.classList.add('active'); // Restore active class for the stored link
+      }
+      link.addEventListener('click', function () {
+        setActiveLink(this); // Set the active link on click
+      });
+    });
+  });
+</script>
+<script>
+  function logout() {
+    // Clear authentication token from local storage
+    localStorage.removeItem("token");
+
+    // Redirect to the login page or any other page
+    window.location.href = "login.html"; // Replace with your login page URL
+  }
+</script>
 
 <script src="./view_review.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
