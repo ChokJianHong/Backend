@@ -23,7 +23,8 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
-  updateFCMToken
+  updateFCMToken,
+  getWarrantyDetails,
 } = require("../controllers/customerController");
 
 const router = express.Router();
@@ -101,6 +102,7 @@ router.get("/fetch-last-login", getLastLogin);
 router.post("/customer/register", customerRegister);
 router.get("/technician/customersDetail/:id", getCustomer);
 router.get("/customer/:token", getCustomerByToken);
+router.get("/warranty-details", getWarrantyDetails);
 router.post("/customer/:id", decodeToken, updateFCMToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);

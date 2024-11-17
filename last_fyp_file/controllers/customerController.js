@@ -274,6 +274,58 @@ db.query(updateUserTokenQuery, (error) => {
 });
 }
 
+
+function getWarrantyDetails(req, res) {
+  const getWarrantyQuery = `
+    SELECT 
+      customer_id,
+      name,
+      auto_gate_brand,
+      auto_gate_warranty,
+      alarm_brand,
+      alarm_warranty
+    FROM customer;
+  `;
+
+  db.query(getWarrantyQuery, (error, results) => {
+    if (error) {
+      return res.status(500).json({ message: "Database error", status: 500 });
+    }
+
+    if (results.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No customer data found", status: 404 });
+    }
+
+    // Map results to include status dynamically
+    const warranties = results.map((customer) => ({
+      customer_id: customer.customer_id,
+      name: customer.name,
+      auto_gate: {
+        brand: customer.auto_gate_brand,
+        warranty: customer.auto_gate_warranty,
+        status:
+          new Date(customer.auto_gate_warranty) >= new Date()
+            ? "Active"
+            : "Expired",
+      },
+      alarm: {
+        brand: customer.alarm_brand,
+        warranty: customer.alarm_warranty,
+        status:
+          new Date(customer.alarm_warranty) >= new Date()
+            ? "Active"
+            : "Expired",
+      },
+    }));
+
+    return res.status(200).json({ status: 200, data: warranties });
+  });
+}
+
+
+
 module.exports = {
   customerRegister,
   getAllCustomers,
@@ -282,5 +334,6 @@ module.exports = {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
-  updateFCMToken
+  updateFCMToken,
+  getWarrantyDetails,
 };
