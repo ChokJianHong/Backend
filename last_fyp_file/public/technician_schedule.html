@@ -28,7 +28,7 @@
   <!-- Sidebar content -->
 
   <ul>
-    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
     <li><a href="inventory.html">Inventory</a></li>
     <li><a href="analysis.html">Business Analysis</a></li>
@@ -41,6 +41,9 @@
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
+    <li><a href="view_review.html">Review</a></li>
+    <li><a href="warranty.html">Warranty details</a></li>
+
   </ul>
   <button id="logout" class="logout-btn" onclick="logout()">Log Out</button>
 </div>
@@ -57,28 +60,34 @@
 
 
 <script>
-  const links = document.querySelectorAll('.sidebar ul li a');
-
-  // Function to set the active class on the current link
-  function setActiveLink(link) {
-    links.forEach(link => link.classList.remove('active')); // Remove active class from all links
-    link.classList.add('active'); // Add active class to the clicked link
-    localStorage.setItem('activeLink', link.href); // Store the current link in localStorage
-  }
-
-  // Apply the active class to the stored link on page load
   document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.sidebar ul li a');
+
+    // Retrieve the active link from localStorage
     const activeLink = localStorage.getItem('activeLink');
+
+    // Loop through each link
     links.forEach(link => {
+      // Check if the link matches the stored active link
       if (link.href === activeLink) {
-        link.classList.add('active'); // Restore active class for the stored link
+        link.classList.add('active');
       }
+
+      // Add click event listener to update the active link
       link.addEventListener('click', function () {
-        setActiveLink(this); // Set the active link on click
+        // Remove active class from all links
+        links.forEach(link => link.classList.remove('active'));
+        
+        // Add active class to the clicked link
+        this.classList.add('active');
+        
+        // Store the active link in localStorage
+        localStorage.setItem('activeLink', this.href);
       });
     });
   });
 </script>
+
 <script>
   function logout() {
     // Clear authentication token from local storage

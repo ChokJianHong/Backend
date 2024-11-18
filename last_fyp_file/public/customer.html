@@ -29,7 +29,7 @@
   <!-- Sidebar content -->
 
   <ul>
-    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
     <li><a href="inventory.html">Inventory</a></li>
     <li><a href="analysis.html">Business Analysis</a></li>
@@ -42,6 +42,9 @@
     <li><a href="customer.html">Customer</a></li>
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
+    <li><a href="view_review.html">Review</a></li>
+    <li><a href="warranty.html">Warranty details</a></li>
+
   </ul>
   <button id="logout" class="logout-btn" onclick="logout()">Log Out</button></div>
 </div>
@@ -186,16 +189,25 @@
 <script>
   const links = document.querySelectorAll('.sidebar ul li a');
 
-  links.forEach(link => {
-    link.addEventListener('click', function() {
-      // Remove active class from all links
-      links.forEach(link => link.classList.remove('active'));
-      
-      // Add active class to the clicked link
-      this.classList.add('active');
+  // Function to set the active class on the current link
+  function setActiveLink(link) {
+    links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+    link.classList.add('active'); // Add active class to the clicked link
+    localStorage.setItem('activeLink', link.href); // Store the current link in localStorage
+  }
+
+  // Apply the active class to the stored link on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const activeLink = localStorage.getItem('activeLink');
+    links.forEach(link => {
+      if (link.href === activeLink) {
+        link.classList.add('active'); // Restore active class for the stored link
+      }
+      link.addEventListener('click', function () {
+        setActiveLink(this); // Set the active link on click
+      });
     });
   });
-</script>
 </script>
 <script>
   function logout() {
@@ -206,6 +218,7 @@
     window.location.href = "login.html"; // Replace with your login page URL
   }
 </script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -23,7 +23,8 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerByToken,
-  updateFCMToken
+  updateFCMToken,
+  getWarrantyDetails,
 } = require("../controllers/customerController");
 
 const router = express.Router();
@@ -87,7 +88,7 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
-const { createRequestForm, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
+const { createRequestForm,checkAvailability, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes
 router.post("/login", login);
@@ -101,6 +102,7 @@ router.get("/fetch-last-login", getLastLogin);
 router.post("/customer/register", customerRegister);
 router.get("/technician/customersDetail/:id", getCustomer);
 router.get("/customer/:token", getCustomerByToken);
+router.get("/warranty-details", getWarrantyDetails);
 router.post("/customer/:id", decodeToken, updateFCMToken);
 //technician routes
 router.get("/technician/:token", getTechnicianByToken);
@@ -173,6 +175,8 @@ router.post('/chat/sendMessage', sendMessage);
 // request form // new_addition
 router.post("/request", createRequestForm);
 router.put("/request/:id", updateRequestFormStatus);
+router.get('/request/availability', checkAvailability);
+
 router.get("/request", getAllRequestForms);
 router.delete("/request/:id", deleteRequestForm);
 router.get("/request/:id", getRequestFormById);

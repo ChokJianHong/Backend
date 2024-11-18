@@ -254,6 +254,60 @@ function trackOrderStatus(req, res) {
 }
 
 
+function checkAvailability(req, res) {
+  console.log("checkAvailability API hit");
+
+  const { type } = req.user || {}; // Safely access req.user
+  console.log("User type:", type);
+
+  // Temporarily bypass admin check
+  // if (type !== "admin") {
+  //   console.log("Unauthorized access attempt. User type:", type);
+  //   return res.status(401).json({ message: "Unauthorized" });
+  // }
+
+  const query = `
+    SELECT 
+  rf.parts_needed, 
+  COALESCE(i.name, 'Not Found') AS inventory_name,
+  COALESCE(i.stockAmount, 0) AS stockAmount,
+  CASE 
+    WHEN i.name IS NULL THEN 'Not Available'  -- If no matching part in inventory
+    WHEN i.stockAmount > 0 THEN 'Available'   -- If stock > 0
+    ELSE 'Not Available'                      -- If stock is 0 or less
+  END AS availability
+FROM 
+  request_forms rf
+LEFT JOIN 
+  inventory i 
+ON 
+  LOWER(rf.parts_needed) = LOWER(i.name);  -- Ensure case-insensitive matching
+
+  `;
+
+  console.log("Executing query...");
+
+  db.query(query, (err, rows) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+
+    console.log("Query results:", rows);
+
+    if (rows.length === 0) {
+      console.log("No matching parts found in inventory.");
+      return res.status(404).json({ message: "No matching parts found in inventory" });
+    }
+
+    res.status(200).json(rows);
+  });
+}
+
+
+
+
+
 
 module.exports = {
   createRequestForm,
@@ -263,4 +317,6 @@ module.exports = {
   getRequestFormById,
   getRequestFormsByTechnician,
   trackOrderStatus,
+  checkAvailability,
+
 };

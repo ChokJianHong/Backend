@@ -28,7 +28,7 @@
   <!-- Sidebar content -->
 
   <ul>
-    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
     <li><a href="technician_schedule.html">Schedule</a></li>
     <li><a href="inventory.html">Inventory</a></li>
     <li><a href="analysis.html">Business Analysis</a></li>
@@ -42,6 +42,8 @@
     <li>Application</li>
     <li><a href="banner.html">Homepage Banner</a></li>
     <li><a href="view_review.html">Review</a></li>
+    <li><a href="warranty.html">Warranty Details</a></li>
+  </ul>
 
   </ul>
   <button id="logout" class="logout-btn">Log Out</button>
@@ -50,14 +52,57 @@
 
 <div class="dashboard-container">
   <div class="container">
-    <h1> Reviews</h1>
+    <h1 class="text-primary text-center mb-4">Customer Reviews</h1>
+
+    <!-- Introductory Section -->
+    <div class="reviews-summary mb-4 p-3 text-center bg-light rounded">
+      <p>Explore feedback from our valued customers about their experiences with our services. See what they loved, what they rated, and how we’re striving for excellence.</p>
+    
+    </div>
+
+    <!-- Review Container -->
     <div id="review-container" class="row">
       <!-- Reviews will be dynamically injected here by JavaScript -->
       <div class="loading-spinner" id="loading-spinner"></div>
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.sidebar ul li a'); // Select all sidebar links
 
+    // Get the stored active link from localStorage
+    const activeLink = localStorage.getItem('activeLink');
+
+    // Set the active class if the current link matches the stored link
+    links.forEach(link => {
+      if (link.href === activeLink) {
+        link.classList.add('active');
+      }
+
+      // Add click event listener to update the active link
+      link.addEventListener('click', function () {
+        // Remove the active class from all links
+        links.forEach(l => l.classList.remove('active'));
+
+        // Add the active class to the clicked link
+        this.classList.add('active');
+
+        // Store the active link in localStorage
+        localStorage.setItem('activeLink', this.href);
+      });
+    });
+  });
+</script>
+<script>
+  function logout() {
+    // Clear authentication token from local storage
+    localStorage.removeItem("token");
+
+    // Redirect to the login page or any other page
+    window.location.href = "login.html"; // Replace with your login page URL
+  }
+</script>
 
 <script src="./view_review.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

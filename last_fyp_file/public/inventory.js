@@ -215,7 +215,6 @@ function displayInventoryItems(items) {
           <p class="card-text"><strong>Features:</strong> ${item.features}</p>
           <p class="card-text"><strong>Stock Amount:</strong> ${item.stockAmount}</p>
           <p class="card-text"><strong>Price:</strong> ${item.price}</p>
-          <button class="btn btn-warning btn-sm" onclick="selectItem(${item.id})">Select</button>
           <button class="btn btn-warning btn-sm" onclick="editItem(${item.id})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.id})">Delete</button>
         </div>
