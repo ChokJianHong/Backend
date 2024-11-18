@@ -58,7 +58,7 @@
     </div>
 
     <ul>
-      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="dashboard.html" >Dashboard</a></li>
       <li><a href="technician_schedule.html">Schedule</a></li>
       <li><a href="inventory.html">Inventory</a></li>
       <li><a href="analysis.html">Business Analysis</a></li>
@@ -72,7 +72,7 @@
       <li>Application</li>
       <li><a href="banner.html">Homepage Banner</a></li>
       <li><a href="view_review.html">Review</a></li>
-      <li><a href="warranty_details.html">Warranty Details</a></li>
+      <li><a href="warranty.html">Warranty Details</a></li>
     </ul>
     <button id="logout" class="logout-btn">Log Out</button>
   </div>
@@ -80,29 +80,43 @@
   <!-- Main Content -->
   <div class="dashboard-container">
     <div class="container">
+      
       <div class="card">
+        <div class="warranty-intro mb-4">
+          <p><b>Welcome!</b> to the warranty details page. Here, you can view the active and expired warranties for auto gates and alarm systems. Active warranties are highlighted in green, while expired warranties are shown in red. Keep track of your warranty status to ensure seamless service and support.</p>
+        </div>
         <div class="card-header text-center">Customer Warranty Details</div>
-        <div class="card-body">
-          <table class="table table-bordered table-striped" id="warranty-table">
+         
+        
+
+        <div class="card-body" style="padding: 10px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+          <table class="table table-bordered table-striped" id="warranty-table" style="width: 100%; font-size: 0.75rem; border-spacing: 0 5px;">
             <thead>
-              <tr>
-                <th>Customer Name</th>
-                <th>Auto Gate Brand</th>
-                <th>Auto Gate Warranty</th>
-                <th>Status</th>
-                <th>Alarm Brand</th>
-                <th>Alarm Warranty</th>
-                <th>Status</th>
+              <tr style="background-color: #495057; color: #ffffff; text-transform: uppercase; font-weight: bold; text-align: center;">
+                <th style="padding: 6px;">Customer Name</th>
+                <th style="padding: 6px;">Auto Gate Brand</th>
+                <th style="padding: 6px;">Auto Gate Warranty</th>
+                <th style="padding: 6px;">Status</th>
+                <th style="padding: 6px;">Alarm Brand</th>
+                <th style="padding: 6px;">Alarm Warranty</th>
+                <th style="padding: 6px;">Status</th>
               </tr>
             </thead>
             <tbody>
               <!-- Data will be dynamically populated here -->
+              <tr>
+                <td style="padding: 5px; text-align: center;">John Doe</td>
+                <td style="padding: 5px; text-align: center;">Brand X</td>
+                <td style="padding: 5px; text-align: center;">2024-12-30</td>
+                <td style="padding: 5px; text-align: center; color: green; font-weight: bold;">Active</td>
+                <td style="padding: 5px; text-align: center;">Alarm Y</td>
+                <td style="padding: 5px; text-align: center;">2025-06-29</td>
+                <td style="padding: 5px; text-align: center; color: red; font-weight: bold;">Expired</td>
+              </tr>
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-  </div>
+        
 
   <!-- JavaScript -->
   <script>
@@ -130,6 +144,14 @@
           tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error loading warranty data</td></tr>`;
         }
       }
+      function formatDate(isoDate) {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }); // Only date, no time
+}
 
       function populateWarrantyTable(warranties) {
         tableBody.innerHTML = ""; // Clear previous data
@@ -147,8 +169,7 @@
 
           // Auto Gate Warranty
           const autoGateWarrantyCell = document.createElement("td");
-          autoGateWarrantyCell.textContent = warranty.auto_gate.warranty;
-
+          autoGateWarrantyCell.textContent = formatDate(warranty.auto_gate.warranty);
           // Auto Gate Status
           const autoGateStatusCell = document.createElement("td");
           autoGateStatusCell.textContent = warranty.auto_gate.status;
@@ -162,8 +183,7 @@
 
           // Alarm Warranty
           const alarmWarrantyCell = document.createElement("td");
-          alarmWarrantyCell.textContent = warranty.alarm.warranty;
-
+          alarmWarrantyCell.textContent = formatDate(warranty.alarm.warranty);
           // Alarm Status
           const alarmStatusCell = document.createElement("td");
           alarmStatusCell.textContent = warranty.alarm.status;
@@ -189,6 +209,43 @@
       fetchWarrantyDetails();
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.sidebar ul li a'); // Select all sidebar links
+  
+      // Get the stored active link from localStorage
+      const activeLink = localStorage.getItem('activeLink');
+  
+      // Set the active class if the current link matches the stored link
+      links.forEach(link => {
+        if (link.href === activeLink) {
+          link.classList.add('active');
+        }
+  
+        // Add click event listener to update the active link
+        link.addEventListener('click', function () {
+          // Remove the active class from all links
+          links.forEach(l => l.classList.remove('active'));
+  
+          // Add the active class to the clicked link
+          this.classList.add('active');
+  
+          // Store the active link in localStorage
+          localStorage.setItem('activeLink', this.href);
+        });
+      });
+    });
+  </script>
+  <script>
+    function logout() {
+      // Clear authentication token from local storage
+      localStorage.removeItem("token");
+  
+      // Redirect to the login page or any other page
+      window.location.href = "login.html"; // Replace with your login page URL
+    }
+  </script>
+  
 </body>
 
 </html>

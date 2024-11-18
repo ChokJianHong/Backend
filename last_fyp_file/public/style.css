@@ -7,6 +7,107 @@
  
 }
 
+
+
+
+/* Input Field Styling */
+#searchInput {
+  padding-left: 40px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  height: 45px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus Effect */
+#searchInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* Search Icon Styling */
+.fa-search {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: gray;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+/* Change Icon Color on Focus */
+#searchInput:focus + .fa-search {
+  color: #007bff;
+}
+
+/* Hover Effect for Input */
+#searchInput:hover {
+  border-color: #ccc;
+}
+
+
+
+
+
+
+
+
+
+h1 i {
+  vertical-align: middle;
+  margin-right: 10px;
+  font-size: 1.5em;
+}
+
+
+
+
+/* Review Card Container */
+.review-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect for Review Card */
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Technician Name Styling */
+.review-technician {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Location and Review Text */
+.review-card p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Star Rating Styling */
+.star-rating {
+  font-size: 1.2rem;
+  color: #ffa500; /* Orange color for filled stars */
+}
+
+.star-rating .empty-star {
+  color: #ccc; /* Light gray for empty stars */
+}
+
+
+
   /* Header Styles */
   .header {
     position: fixed;

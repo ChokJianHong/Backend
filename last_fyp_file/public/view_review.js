@@ -44,19 +44,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     reviews.forEach((review) => {
+      const starRating = getStarRating(review.rating || 0); // Use stars for the rating
       const reviewHtml = `
-        <div class="col-md-6 offset-md-3">
-          <div class="review-card">
-            <p><strong>Technician:</strong> ${review.technician_name || 'N/A'}</p>
-            <p><strong>Location:</strong> ${review.address || 'Address not provided'}</p>
-            <p><strong>Rating:</strong> ${review.rating || 'No rating available'}</p>
-            <p><strong>Review:</strong> ${review.review_text || 'No comments available'}</p>
-            <p><strong>Date:</strong> ${review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Date not available'}</p>
-          </div>
-        </div>
+       <div class="col-md-6 offset-md-3">
+  <div class="review-card p-4 rounded shadow-sm">
+    <h5 class="review-technician text-primary mb-3">
+      <i class="fas fa-user-circle me-2"></i>${review.technician_name || 'N/A'}
+    </h5>
+    <p><i class="fas fa-map-marker-alt text-muted me-2"></i><strong>Location:</strong> ${review.address || 'Address not provided'}</p>
+    <p><i class="fas fa-star text-warning me-2"></i><strong>Rating:</strong> <span class="star-rating">${starRating}</span></p>
+    <p><i class="fas fa-comment-alt text-muted me-2"></i><strong>Review:</strong> ${review.review_text || 'No comments available'}</p>
+    <p><i class="fas fa-calendar-alt text-muted me-2"></i><strong>Date:</strong> ${review.review_date ? new Date(review.review_date).toLocaleDateString() : 'Date not available'}</p>
+  </div>
+</div>
+
       `;
       reviewContainer.innerHTML += reviewHtml;
     });
+    
   }
 
   function getStarRating(rating) {
@@ -64,6 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const emptyStars = 5 - filledStars;
     return '★'.repeat(filledStars) + '☆'.repeat(emptyStars);
   }
-
+  
   fetchReviews();
 });
