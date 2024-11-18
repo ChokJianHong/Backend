@@ -44,8 +44,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("problem_type").innerText =
           data.problem_type[0].toUpperCase() + data.problem_type.substring(1);
+        
+        // Convert the time strings to Date objects by adding a fixed date (e.g., "1970-01-01")
+        const startTime = new Date(`1970-01-01T${data.technician_start_time}`);
+        const stopTime = new Date(`1970-01-01T${data.technician_stop_time}`);
+
+        // Calculate the difference in milliseconds
+        const timeDifferenceInMillis = stopTime - startTime;
+
+        // Convert milliseconds to hours and minutes
+        const hours = Math.floor(timeDifferenceInMillis / (1000 * 60 * 60)); // Convert to hours
+        const minutes = Math.floor((timeDifferenceInMillis % (1000 * 60 * 60)) / (1000 * 60)); // Convert remaining to minutes
+
+        document.getElementById("working_time").innerText =
+          `${hours} hours and ${minutes} minutes`;
+
 
         document.getElementById("total_price").innerText = data.total_price;
+
+        document.getElementById("spare_parts").innerText = data.requested_spare_part;
 
         document.getElementById("technician_email").innerText =
           data.technician_email;

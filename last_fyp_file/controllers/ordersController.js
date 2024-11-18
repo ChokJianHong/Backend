@@ -356,17 +356,22 @@ function invoiceOrder(req, res) {
       o.rating,
       o.review_text,
       o.review_date,
+      o.technician_start_time,
+      o.technician_stop_time,
       c.name AS customer_name,
       c.location AS customer_address,
       c.email AS customer_email,
       c.phone_number AS customer_phone_number,
       t.name AS technician_name,
       t.location AS technician_location,
-      t.email AS technician_email
+      t.email AS technician_email,
+      r.parts_needed AS requested_spare_part
+
     FROM 
       ordertable o
       LEFT JOIN customer c ON o.customer_id = c.customer_id
       LEFT JOIN technician t ON o.technician_id = t.technician_id
+      LEFT JOIN request_forms r ON o.id = r.id
     WHERE 
       o.order_id = ${orderId} AND
       o.order_status = 'completed'
