@@ -80,6 +80,7 @@ const {
   changeTechnicianStatus,
   updateFCMTokenTechnician,
   declineOrderForTechnician,
+  checkTechnicianAvailability
 } = require("../controllers/technicianController");
 const {
   createBanner,
@@ -109,6 +110,7 @@ router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
 router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
 router.put("/technician/:id/decline-request", decodeToken, declineOrderForTechnician);
+router.post("/technician/check-overlap/:id", checkTechnicianAvailability);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
