@@ -139,20 +139,22 @@ function customerPendingOrders(orders) {
   }
 
   orders.forEach((order) => {
-    // Calculate days ago
+    // Calculate days difference
     const orderDate = new Date(order.order_date); // Assuming order_date is in a format like 'YYYY-MM-DD'
     const today = new Date();
-    const diffTime = Math.abs(today - orderDate);
-    const daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+    const diffTime = orderDate - today; // Difference in milliseconds
+    const daysDifference = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
 
     // Determine display text for days ago
     let daysAgoText;
-    if (daysAgo === 0) {
+    if (daysDifference === 0) {
       daysAgoText = "Today";
-    } else if (daysAgo === 1) {
-      daysAgoText = "1 day ago";
+    } else if (daysDifference > 0) {
+      daysAgoText = `In ${daysDifference} days`; // Future date
+    } else if (daysDifference === -1) {
+      daysAgoText = "1 day ago"; // Yesterday
     } else {
-      daysAgoText = `${daysAgo} days ago`;
+      daysAgoText = `${Math.abs(daysDifference)} days ago`; // Past date
     }
 
     container.innerHTML += `
@@ -160,13 +162,14 @@ function customerPendingOrders(orders) {
         <td>#000${order.order_id}</td>
         <td>${order.problem_type}</td>
         <td class="${order.urgency_level.toLowerCase()}">
-          ${order.urgency_level[0].toUpperCase() + order.urgency_level.substring(1)} ( ${daysAgoText})
+          ${order.urgency_level[0].toUpperCase() + order.urgency_level.substring(1)} (${daysAgoText})
         </td>
         <td><a href="requests.html"><button>View</button></a></td>
       </tr>
     `;
   });
 }
+
 
 
 // Display Ongoing Orders
