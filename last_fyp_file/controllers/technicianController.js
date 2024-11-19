@@ -347,6 +347,75 @@ function declineOrderForTechnician(req, res) {
   });
 }
 
+// Function to check if the technician can accept a new job
+function checkTechnicianAvailability(req, res) {
+  // Get technicianId, orderDate, and orderTime from the request
+  const technicianId = req.params.technicianId;
+  const { orderDate, orderTime } = req.body;
+
+  console.log('Received technicianId:', technicianId);
+  console.log('Received order date:', orderDate);
+  console.log('Received order time:', orderTime);
+
+  // Combine orderDate and orderTime into a single Date object for comparison
+  const newOrderTime = new Date(`${orderDate}T${orderTime}`);
+
+  // Query to check technician's current status (working or not)
+  const statusQuery = `
+    SELECT status 
+    FROM technicians 
+    WHERE technician_id = ${technicianId};
+  `;
+
+  // Execute the query to check technician status
+  query(statusQuery, (err, statusResults) => {
+    if (err) {
+      console.error('Error executing technician status query:', err);
+      return res.status(500).json({ error: 'Database query error' });
+    }
+
+    // Check if technician is available (status must not be "working")
+    if (statusResults.length > 0 && statusResults[0].status === 'working') {
+      return res.status(400).json({ error: 'Technician is already working and cannot accept a new job.' });
+    }
+
+    // Query to get existing jobs for the technician (only accepted or ongoing jobs)
+    const overlapQuery = `
+      SELECT order_id, order_date, order_time 
+      FROM ordertable 
+      WHERE technician_id = ${technicianId} 
+      AND order_status IN ('accepted', 'ongoing');
+    `;
+
+    // Execute the query to check for time overlap with existing jobs
+    query(overlapQuery, (err, overlapResults) => {
+      if (err) {
+        console.error('Error executing overlap query:', err);
+        return res.status(500).json({ error: 'Database query error' });
+      }
+
+      // Loop through each existing job and check for time overlap
+      for (let job of overlapResults) {
+        const existingOrderDate = job.order_date;
+        const existingOrderTime = job.order_time;
+
+        // Combine existing order date and time to create a Date object for the existing order
+        const existingOrderTimeObj = new Date(`${existingOrderDate}T${existingOrderTime}`);
+
+        // Check if the new order's time is exactly the same as an existing order
+        if (newOrderTime.getTime() === existingOrderTimeObj.getTime()) {
+          console.log('Time overlap detected with existing job');
+          return res.status(400).json({ error: 'The new job overlaps with an existing scheduled job.' });
+        }
+      }
+
+      // If no overlap is found and technician is available
+      console.log('Technician is available to accept the new job');
+      return res.status(200).json({ message: 'Technician is available for the new job.' });
+    });
+  });
+}
+
 
 
 module.exports = {
@@ -360,5 +429,6 @@ module.exports = {
   updateTechnicianArrivalTime,
   changeTechnicianStatus,
   updateFCMTokenTechnician,
-  declineOrderForTechnician
+  declineOrderForTechnician,
+  checkTechnicianAvailability
 };
