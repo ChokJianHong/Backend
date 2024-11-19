@@ -182,10 +182,16 @@
 
 
 
+
+
+// Global chart variable
+let completedOrderSalesChart = null;
+
 // Fetch completed order sales statistics
 function fetchCompletedOrderSales() {
     const url = `${baseUrl}/orders/completed-sales-stats`;
     const token = localStorage.getItem("token");
+
     if (!token) {
         console.error("No token found in local storage");
         return;
@@ -198,106 +204,127 @@ function fetchCompletedOrderSales() {
             Authorization: `${token}`,
         }
     })
-    .then(response => {
-        if (!response.ok && response.status === 401) {
-            window.location.href = "unauthorize_response.html";
-            return;
-        }
-        return response.json();
-    })
-    .then(data => {
-        displayCompletedOrderSalesChartWithRegression(data);
-    })
-    .catch(error => console.error('Error fetching completed order sales data:', error));
+        .then(response => {
+            if (!response.ok && response.status === 401) {
+                window.location.href = "unauthorize_response.html";
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayCompletedOrderSalesChartWithHoltSmoothing(data);
+        })
+        .catch(error => console.error('Error fetching completed order sales data:', error));
 }
 
-// Perform Linear Regression for prediction
-function performLinearRegression(x, y) {
-    const n = x.length;
-    const sumX = x.reduce((acc, val) => acc + val, 0);
-    const sumY = y.reduce((acc, val) => acc + val, 0);
-    const sumXY = x.reduce((acc, val, i) => acc + (val * y[i]), 0);
-    const sumX2 = x.reduce((acc, val) => acc + (val * val), 0);
+// Double Exponential Smoothing
+function doubleExponentialSmoothing(data, alpha, beta) {
+    const level = [];
+    const trend = [];
+    const smoothed = [];
 
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
+    // Initialize the first values
+    level[0] = data[0];
+    trend[0] = data[1] - data[0];
+    smoothed[0] = level[0];
 
-    console.log(`Regression Slope: ${slope}, Intercept: ${intercept}`);
-    return { slope, intercept };
+    for (let t = 1; t < data.length; t++) {
+        level[t] = alpha * data[t] + (1 - alpha) * (level[t - 1] + trend[t - 1]);
+        trend[t] = beta * (level[t] - level[t - 1]) + (1 - beta) * trend[t - 1];
+        smoothed[t] = level[t] + trend[t];
+    }
+
+    return smoothed;
 }
 
-// Display chart with Linear Regression prediction
-function displayCompletedOrderSalesChartWithRegression(data) {
+// Predict future values using the trend
+function predictFutureUsingDoubleSmoothing(lastLevel, lastTrend, numFuture) {
+    const predictions = [];
+    for (let i = 1; i <= numFuture; i++) {
+        const prediction = lastLevel + i * lastTrend;
+        predictions.push(Math.max(prediction, 1000)); // Set a minimum floor of 1000
+    }
+    return predictions;
+}
+
+// Display chart with Double Exponential Smoothing
+function displayCompletedOrderSalesChartWithHoltSmoothing(data) {
     const months = [];
     const totalPrices = [];
 
     // Extract months and total prices from data
     data.slice(1).forEach(row => {
-        months.push(row[0]);         // Month
-        totalPrices.push(parseFloat(row[2]));    // Total price, make sure to parse as float
+        months.push(row[0]); // Month
+        totalPrices.push(parseFloat(row[2])); // Total price
     });
 
-    // Ensure valid data is being used
-    console.log("Months:", months);
-    console.log("Total Prices:", totalPrices);
+    // Parameters for smoothing
+    const alpha = 0.6; // Increase alpha to emphasize recent data
+const beta = 0.4;  // Adjust beta to better capture trends
 
-    // Convert months to numeric values (1 for the first month, 2 for the second month, etc.)
-    const numericMonths = months.map((_, index) => index + 1);
+    // Apply Double Exponential Smoothing
+    const smoothedData = doubleExponentialSmoothing(totalPrices, alpha, beta);
 
-    // Perform Linear Regression
-    const regressionResult = performLinearRegression(numericMonths, totalPrices);
-
-    // Predict future prices based on the linear regression
+    // Predict future prices
     const futureMonths = getNextMonths(months[months.length - 1], 12);
-    const futureNumericMonths = futureMonths.map((_, index) => numericMonths.length + index + 1);
-    const predictedPrices = futureNumericMonths.map(month => regressionResult.slope * month + regressionResult.intercept);
+    const predictedFuturePrices = predictFutureUsingDoubleSmoothing(
+        smoothedData[smoothedData.length - 1],
+        smoothedData[smoothedData.length - 1] - smoothedData[smoothedData.length - 2],
+        12
+    );
 
-    // Cap negative predictions at zero (since negative sales don't make sense)
-    const cappedPredictedPrices = predictedPrices.map(price => Math.max(price, 0));
+    console.log("Actual Data:", totalPrices);
+    console.log("Smoothed Data:", smoothedData);
+    console.log("Predicted Future Prices:", predictedFuturePrices);
 
-    console.log("Predicted Prices:", cappedPredictedPrices);
+    // Destroy the previous chart if it exists
+    if (completedOrderSalesChart && typeof completedOrderSalesChart.destroy === "function") {
+        completedOrderSalesChart.destroy();
+    }
 
-    // Plot chart using Chart.js
+    // Get the canvas context
     const ctx = document.getElementById('completedOrderSalesChart').getContext('2d');
-    new Chart(ctx, {
+
+    // Create the chart
+    completedOrderSalesChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [...months, ...futureMonths],  // Combine actual and future months
+            labels: [...months, ...futureMonths],
             datasets: [
                 {
                     label: 'Total Price (Actual)',
-                    data: totalPrices, // Actual data only
-                    backgroundColor: 'rgba(255, 206, 86, 0.6)', // Color for actual data
-                    borderColor: 'rgba(255, 206, 86, 1)', // Border color for actual data
+                    data: totalPrices,
+                    backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 2,
-                    fill: false, // No fill for the line chart
-                    lineTension: 0.2,
+                    fill: false,
                 },
                 {
-                    label: 'Predicted Total Price',
-                    data: [...new Array(months.length).fill(null), ...cappedPredictedPrices], // Predictions for future months
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // Different color for prediction
+                    label: 'Smoothed Data',
+                    data: smoothedData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                },
+                {
+                    label: 'Predicted Future Prices',
+                    data: [...new Array(months.length).fill(null), ...predictedFuturePrices],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
-                    fill: false, // No fill for the line chart
-                    lineTension: 0.2,
-                }
+                    fill: false,
+                },
             ]
         },
         options: {
             scales: {
-                x: { 
+                x: {
                     title: { display: true, text: 'Months' },
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 12, // Limit the number of ticks on x-axis
-                    },
                 },
-                y: { 
+                y: {
                     title: { display: true, text: 'Total Price' },
-                    ticks: {
-                        beginAtZero: true // Start the y-axis from 0
-                    }
+                    beginAtZero: true,
                 }
             }
         }
@@ -317,6 +344,9 @@ function getNextMonths(lastMonth, numMonths) {
 
     return result;
 }
+
+// Example Usage: Call this on page load or event
+fetchCompletedOrderSales();
 
 
 
