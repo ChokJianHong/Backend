@@ -110,7 +110,7 @@ router.get("/technician/:token", getTechnicianByToken);
 router.put("/technician/location/:id", decodeToken, sendLocation);
 router.post("/technician/:id", decodeToken, updateFCMTokenTechnician);
 router.put("/technician/:id/decline-request", decodeToken, declineOrderForTechnician);
-router.post("/technician/check-overlap/:id", checkTechnicianAvailability);
+router.get("/technician/check-overlap/:id", checkTechnicianAvailability);
 // order routes
 router.post("/orders/cancel/:id", decodeToken, cancelOrder);
 router.get("/orders/pending", decodeToken, getPendingOrders);
@@ -134,7 +134,7 @@ router.get("/orders/review", decodeToken, viewReview);
 
 
 router.get("/orders/:id", decodeToken, getOrderById);// new_addition
-router.put("/orders/:id", decodeToken, createReview);// new_addition
+router.put("/orders/review/:id", decodeToken, createReview);// new_addition
 router.delete("/orders/:id", decodeToken, deleteOrder);// new_addition
 
 router.put(
