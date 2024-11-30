@@ -447,8 +447,77 @@ fetchCompletedOrderSales();
 }
 
 
+function fetchAIAnalysis() {
+    const url = "http://localhost:5005/dashboarddatabase/run-ai"; // Replace with the correct API endpoint
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        console.error("No token found in local storage");
+        return;
+    }
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = "unauthorize_response.html";
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Determine response type (JSON or plain text)
+            const contentType = response.headers.get("Content-Type");
+            if (contentType && contentType.includes("application/json")) {
+                return response.json(); // Parse as JSON
+            }
+            return response.text(); // Parse as plain text
+        })
+        .then(data => {
+            displayAIAnalysis(data); // Call the display function
+        })
+        .catch(error => console.error('Error fetching AI analysis data:', error));
+}
+
+// Display AI Analysis output on the page
+function displayAIAnalysis(data) {
+    const aiOutputContainer = document.getElementById('aiAnalysisOutput');
+
+    if (typeof data === 'string') {
+        // If plain text, display directly
+        aiOutputContainer.innerHTML = `
+            <h3>AI Business Analysis</h3>
+            <p>${data}</p>
+        `;
+    } else if (typeof data === 'object') {
+        // If JSON, display formatted
+        aiOutputContainer.innerHTML = `
+            <h3>AI Business Analysis</h3>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+    } else {
+        // Handle unexpected data type
+        aiOutputContainer.innerHTML = `
+            <h3>AI Business Analysis</h3>
+            <p>Unexpected response format</p>
+        `;
+    }
+}
+
+
+
+
+
+
       // Call these functions on page load
       window.onload = function() {
+        fetchAIAnalysis();
           fetchProblemStatistics();
           fetchTopSpareParts();
           fetchOrderStatusStatistics();
@@ -532,7 +601,18 @@ fetchCompletedOrderSales();
         </div>
     </div>
 </div>
+
+<!-- AI Analysis Output -->
+
+    
+        <div id="aiAnalysisOutput"></div>
+            <!-- AI Analysis data will be displayed here -->
+     
+
 <script>
+    
+    
+
     document.addEventListener('DOMContentLoaded', () => {
       const links = document.querySelectorAll('.sidebar ul li a'); // Select all sidebar links
   

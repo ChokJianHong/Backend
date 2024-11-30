@@ -89,6 +89,23 @@ const {
   updateBanner,
 } = require("../controllers/bannerController");
 const upload = require("../utils/imgUpload");
+
+
+
+
+const { fetchOrderData } = require('../controllers/fetchOrderData'); // Adjust path if needed
+router.get("/fetch-orders", fetchOrderData);
+
+
+const { runPythonScript } = require('../controllers/pythonController');
+
+router.get("/run-ai", runPythonScript);
+
+
+
+
+
+
 const { createRequestForm,checkAvailability, updateRequestFormStatus, getAllRequestForms, deleteRequestForm, getRequestFormById, getRequestFormsByTechnician, trackOrderStatus } = require("../controllers/requestController");
 
 // auth routes

@@ -901,6 +901,7 @@ tr:nth-child(even) {
   height: 300px; /* Set a default height for charts */
 }
 
+
 /* Responsive behavior for larger screens */
 @media (min-width: 992px) {
   .chart-container {
@@ -924,6 +925,56 @@ tr:nth-child(even) {
   }
 }
 
+
+
+/* Styling for AI Analysis Output */
+#aiAnalysisOutput {
+  background-color: #2e3446; /* Dark background matching dashboard theme */
+  border-radius: 15px; /* Rounded corners for a polished look */
+  padding: 20px; /* Padding for internal spacing */
+  box-shadow: 0px 4px 12px rgba(255, 255, 255, 0.2); /* Subtle shadow for depth */
+  margin: 20px auto; /* Center the container horizontally */
+  color: white; /* Ensure text is visible on the dark background */
+  font-size: 14px; /* Consistent text size */
+  line-height: 1.6; /* Improved readability with line spacing */
+  width: 95%; /* Reduce width to 70% of its parent container */
+  max-width: 3100px; /* Maximum width for larger screens */
+  min-width: 300px; /* Minimum width for smaller screens */
+}
+
+/* Heading inside the AI Analysis Output */
+#aiAnalysisOutput h3 {
+  font-size: 18px; /* Slightly larger font for headings */
+  font-weight: bold;
+  color: #00adb5; /* Distinctive color for the heading */
+  margin-bottom: 15px; /* Space below the heading */
+  text-transform: uppercase; /* Uniform heading style */
+}
+
+/* Paragraph and preformatted text inside AI Analysis Output */
+#aiAnalysisOutput p,
+#aiAnalysisOutput pre {
+  font-size: 14px; /* Consistent text size */
+  color: white; /* Ensure text readability */
+  margin: 10px 0; /* Space around text blocks */
+  background: rgba(0, 0, 0, 0.5); /* Slight background for preformatted text */
+  padding: 10px; /* Padding inside the preformatted block */
+  border-radius: 10px; /* Rounded corners for preformatted text */
+  white-space: pre-wrap; /* Preserve line breaks and formatting */
+  word-break: break-word; /* Prevent text overflow on long words */
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 768px) {
+  #aiAnalysisOutput {
+    padding: 15px; /* Adjust padding for smaller screens */
+    font-size: 13px; /* Slightly smaller text size for compact view */
+  }
+
+  #aiAnalysisOutput h3 {
+    font-size: 16px; /* Adjust heading size for smaller screens */
+  }
+}
 
 /* Styling for the chart container with white text */
 

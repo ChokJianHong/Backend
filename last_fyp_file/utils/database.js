@@ -28,4 +28,5 @@ function query(queryString, callback) {
 }
 module.exports = {
   query,
+  
 };
